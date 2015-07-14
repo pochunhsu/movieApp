@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+    <item android:id="@+id/setting_search"
+          android:icon="@drawable/ic_search_white_48dp"
+          android:title="@string/setting_search"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/setting_sort"
+          android:icon="@drawable/ic_sort_white_48dp"
+          android:title="@string/setting_sort"
+          app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/popularSort"
+                  android:title="@string/popularLabel" />
+            <item android:id="@+id/RatingSort"
+                  android:title="@string/ratingLabel" />
+        </menu>
+    </item>>
+</menu>
