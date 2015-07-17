@@ -5,9 +5,11 @@
     <string name="setting_search">Search</string>
     <string name="popularLabel">Popular</string>
     <string name="ratingLabel">Rating</string>
-    <string name="apiKey">eaf6d9fd9f4deabd752e6f00f0227164</string>
     <string name="network_unavailable_message">Network is unavailable !</string>
     <string name="error_title">Oops! Sorry!</string>
     <string name="error_message">There was an error. Please try again.</string>
     <string name="error_ok_button">OK</string>
+
+    <string name="apiKey">eaf6d9fd9f4deabd752e6f00f0227164</string>
+    <string name="imageUrlPath">http://image.tmdb.org/t/p/w500/</string>
 </resources>
