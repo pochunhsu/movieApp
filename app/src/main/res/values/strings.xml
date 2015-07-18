@@ -11,5 +11,5 @@
     <string name="error_ok_button">OK</string>
 
     <string name="apiKey">eaf6d9fd9f4deabd752e6f00f0227164</string>
-    <string name="imageUrlPath">http://image.tmdb.org/t/p/w500/</string>
+    <string name="imageUrlPath">http://image.tmdb.org/t/p/w342/</string>
 </resources>

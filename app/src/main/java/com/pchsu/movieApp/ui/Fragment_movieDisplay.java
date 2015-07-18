@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class Fragment_movieDisplay extends Fragment {
 
     final String TAG = "Update_Moive";
     private MovieInfo[] mMovies;
+
     private Context mContext;
     private MainActivity mMainActivity;
 
@@ -45,24 +47,26 @@ public class Fragment_movieDisplay extends Fragment {
                              Bundle savedInstanceState) {
         mContext = getActivity();
         mMainActivity = (MainActivity) mContext;
+
         View rootView = inflater.inflate(R.layout.fragment_movie_poster, container, false);
         mGridview = (GridView) rootView.findViewById(R.id.gridDisplay);
-        updateMovies();
+
+        loadMovies();
         return rootView;
     }
 
-    public void updateMovies(){
+    public void loadMovies(){
         if (mMainActivity.isNetworkAvailable()) {
             Uri.Builder uriBuilder = new Uri.Builder();
 
             uriBuilder.scheme("http")
                         .authority("api.themoviedb.org")
                         .path("3/movie/popular")
-                     //   .path("3/discover/movie")
-                     //   .appendQueryParameter("sort_by", "polularity.desc")
-                     //   .appendQueryParameter("release_date.gte", getDateString_minus180())
-                     //   .appendQueryParameter("release_date.lte", getDateString_plus30())
-                    .appendQueryParameter("api_key", getString(R.string.apiKey));
+//                        .path("3/discover/movie")
+//                        .appendQueryParameter("sort_by", "polularity.desc")
+//                        .appendQueryParameter("release_date.gte", getDateString_minus180())
+//                        .appendQueryParameter("release_date.lte", getDateString_plus30())
+                        .appendQueryParameter("api_key", getString(R.string.apiKey));
 
             Uri uri = uriBuilder.build();
             Log.v(TAG, uri.toString());
@@ -108,7 +112,6 @@ public class Fragment_movieDisplay extends Fragment {
         }
     }
 
-
     // return a date 180 days before in the format of YYYY-MM-DD
     public String getDateString_minus180(){
         Calendar date = Calendar.getInstance();
@@ -147,8 +150,13 @@ public class Fragment_movieDisplay extends Fragment {
         return movies;
     }
 
-    // TODO : move this to CreateView?
     public void updateDisplay(){
         mGridview.setAdapter(new ImageAdapter(mContext, mMovies));
+        mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               Toast.makeText(mContext, ""+position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -1,9 +1,11 @@
 package com.pchsu.movieApp.adapter;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.pchsu.movieApp.R;
@@ -14,10 +16,16 @@ public class ImageAdapter extends BaseAdapter {
 
     private Context mContext;
     private MovieInfo[] mMovies;
+    private int mImageWidth, mImageHeight;
 
     public ImageAdapter(Context context, MovieInfo[] movies) {
         mContext = context;
         mMovies = movies;
+
+        // prepare the image size number for picasso resize
+        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        mImageWidth = metrics.widthPixels/2;
+        mImageHeight = (int) (mImageWidth * 1.5);
     }
     @Override
     public int getCount() {
@@ -41,12 +49,17 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null) {
             image = new ImageView(mContext);
             image.setAdjustViewBounds(true);
-            //image.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, 500));
+            image.setLayoutParams(new GridView.LayoutParams(mImageWidth, mImageHeight));
         }else{
             image = (ImageView) convertView;
         }
+
         ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovies[position].getPosterPath();
-        Picasso.with(mContext).load(ImageUrl).into(image);
+
+        Picasso.with(mContext)
+                .load(ImageUrl)
+                .resize(mImageWidth, mImageHeight)
+                .into(image);
         return image;
     }
 }
