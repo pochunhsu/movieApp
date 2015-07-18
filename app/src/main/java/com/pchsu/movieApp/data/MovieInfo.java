@@ -1,6 +1,9 @@
 package com.pchsu.movieApp.data;
 
-public class MovieInfo {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MovieInfo implements Parcelable{
     String mTitle;
     String mBackDropPath;
     String mPosterPath;
@@ -37,4 +40,38 @@ public class MovieInfo {
     public void setOverview(String overview) {
         this.mOverview = overview;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTitle);
+        dest.writeString(mBackDropPath);
+        dest.writeString(mPosterPath);
+        dest.writeString(mOverview);
+    }
+
+    private MovieInfo (Parcel in){
+        mTitle = in.readString();
+        mBackDropPath = in.readString();
+        mPosterPath = in.readString();
+        mOverview = in.readString();
+    }
+
+    public MovieInfo(){}
+
+    public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {
+        @Override
+        public MovieInfo createFromParcel(Parcel source) {
+            return new MovieInfo(source);
+        }
+
+        @Override
+        public MovieInfo[] newArray(int size) {
+            return new MovieInfo[size];
+        }
+    };
 }

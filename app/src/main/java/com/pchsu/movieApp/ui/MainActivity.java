@@ -9,9 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.pchsu.movieApp.R;
+import com.pchsu.movieApp.data.MovieInfo;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    public MovieInfo[] mMovies;
+    public static String TAG = MainActivity.class.getSimpleName();
+    public static final String MOVIE_INFO = "MOVIE_INFO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,6 +1,7 @@
 package com.pchsu.movieApp.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,10 +30,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+//import android.app.Fragment;
+
 public class Fragment_movieDisplay extends Fragment {
 
     final String TAG = "Update_Moive";
-    private MovieInfo[] mMovies;
 
     private Context mContext;
     private MainActivity mMainActivity;
@@ -90,7 +92,7 @@ public class Fragment_movieDisplay extends Fragment {
                         String jsonData = response.body().string();
                         Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
-                            mMovies = parseMovieDetails(jsonData);
+                            mMainActivity.mMovies = parseMovieDetails(jsonData);
                             mMainActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -151,11 +153,15 @@ public class Fragment_movieDisplay extends Fragment {
     }
 
     public void updateDisplay(){
-        mGridview.setAdapter(new ImageAdapter(mContext, mMovies));
+        mGridview.setAdapter(new ImageAdapter(mContext, mMainActivity.mMovies));
+
         mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               Toast.makeText(mContext, ""+position, Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(mMainActivity, DetailActivity.class);
+                i.putExtra(MainActivity.MOVIE_INFO, mMainActivity.mMovies[position]);
+
+                startActivity(i);
             }
         });
     }
