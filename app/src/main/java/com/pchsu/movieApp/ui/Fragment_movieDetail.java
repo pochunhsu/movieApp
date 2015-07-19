@@ -25,9 +25,6 @@ public class Fragment_movieDetail extends Fragment{
     private DetailActivity mActivity;
     private Resources mResources;
 
-    private int mTopSecHeight;
-    private int mMiddleSecHeight;
-
     @Bind(R.id.topSection) RelativeLayout mTopSec;
     @Bind(R.id.middleSection) RelativeLayout mMiddleSec;
     @Bind(R.id.titleImage) ImageView mTitleImage;
@@ -39,27 +36,25 @@ public class Fragment_movieDetail extends Fragment{
     @Bind(R.id.releaseDateLabel) TextView mReleaseDateText;
     @Bind(R.id.overviewLabel) TextView mOverViewText;
 
-    public Fragment_movieDetail() {
-    }
-
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = getActivity();
         mActivity = (DetailActivity) mContext;
 
-        // generate height to program the sections' height later
+        // program the sections' height based on the screen size and the weight integer specified in xml
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
         mResources = getResources();
-        mTopSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.topSecWeight) / 100;
-        mMiddleSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.middleSecWeight) / 100;
+        int topSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.topSecWeight) / 100;
+        int middleSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.middleSecWeight) / 100;
 
         // inflate the view and instantiate all elements
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
 
-        // setup heights in the top and middle sections
-        mTopSec.getLayoutParams().height = mTopSecHeight;
-        mMiddleSec.getLayoutParams().height = mMiddleSecHeight;
+        // set heights for the top and middle sections
+        mTopSec.getLayoutParams().height = topSecHeight;
+        mMiddleSec.getLayoutParams().height = middleSecHeight;
 
         // using picasso api to load images from web
         String ImageUrl = mContext.getString(R.string.imageUrlPath) + mActivity.getMovie().getBackDropPath();
@@ -81,6 +76,7 @@ public class Fragment_movieDetail extends Fragment{
         return rootView;
     }
 
+    // convert 10-star rating to 5-star
     private double convertRating_10to5 (double rating){
         double result = rating / 2;
         result = Math.round(result* 10.0) / 10.0;

@@ -13,11 +13,13 @@
           app:showAsAction="ifRoom">
         <menu>
             <item android:id="@+id/menu_sort_popular"
-                  android:title="@string/popularLabel"
-                  />
+                  android:title="@string/popularLabel"/>
             <item android:id="@+id/menu_sort_rating"
-                  android:title="@string/ratingLabel"
-                  />
+                  android:title="@string/ratingLabel"/>
+            <item android:id="@+id/menu_sort_playing"
+                  android:title="@string/playingLabel"/>
+            <item android:id="@+id/menu_sort_upcoming"
+                  android:title="@string/upcomingLabel"/>
         </menu>
     </item>>
 </menu>

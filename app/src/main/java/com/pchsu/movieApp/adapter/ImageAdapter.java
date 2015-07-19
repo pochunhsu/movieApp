@@ -60,6 +60,8 @@ public class ImageAdapter extends BaseAdapter {
 
         Picasso.with(mContext)
                 .load(ImageUrl)
+                .placeholder(R.drawable.cloud_download)
+                .error(R.drawable.cloud_error)
 //                .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image
                 .into(image);
         return image;

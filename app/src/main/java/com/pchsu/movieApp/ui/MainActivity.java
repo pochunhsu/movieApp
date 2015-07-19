@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.pchsu.movieApp.R;
-import com.pchsu.movieApp.data.MovieInfo;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -15,17 +14,10 @@ public class MainActivity extends AppCompatActivity {
     public static String TAG = MainActivity.class.getSimpleName();
     public static final String MOVIE_INFO = "MOVIE_INFO";
 
-    public MovieInfo[] mMovies;
-
-    public enum SortSetting{POPULAR, RATING}
-    public SortSetting mSortSetting;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mSortSetting = SortSetting.POPULAR;  // default
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -33,39 +25,7 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.setting_sort) {
-            return true;
-        }
-
-        if (id == R.id.menu_sort_popular) {
-            Toast.makeText(this, "sort popular", Toast.LENGTH_SHORT);
-            return true;
-        }
-        if (id == R.id.menu_sort_rating) {
-            Toast.makeText(this, "sort rating", Toast.LENGTH_SHORT);
-            return true;
-        }
-
-            return super.onOptionsItemSelected(item);
-    }
-
-*/
     public boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);

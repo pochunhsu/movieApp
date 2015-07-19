@@ -37,20 +37,26 @@ import java.util.Calendar;
 
 public class Fragment_movieDisplay extends Fragment {
 
-    final String TAG = "Update_Moive";
+    public static final String TAG = "MoviePoster";
 
     private Context mContext;
     private MainActivity mMainActivity;
 
+    private MovieInfo[] mMovies;
+
     private GridView mGridview;
 
-    public Fragment_movieDisplay() {
-    }
+    private enum SortSetting{POPULAR, RATING, PLAYING, UPCOMING}
+    private SortSetting mSortSetting;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
+
+        mSortSetting = SortSetting.POPULAR;  // default
     }
 
     @Override
@@ -73,6 +79,7 @@ public class Fragment_movieDisplay extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    // reload movie data on different sort setting selected in the menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -86,24 +93,56 @@ public class Fragment_movieDisplay extends Fragment {
         }
 
         if (id == R.id.menu_sort_popular) {
-            Toast.makeText(mContext, "sort popular", Toast.LENGTH_SHORT);
+            mSortSetting = SortSetting.POPULAR;
+            loadMovies();
+            mMainActivity.setTitle("MovieApp - Popular");
             return true;
         }
         if (id == R.id.menu_sort_rating) {
-            Toast.makeText(mContext, "sort rating", Toast.LENGTH_SHORT);
+            mSortSetting = SortSetting.RATING;
+            loadMovies();
+            mMainActivity.setTitle("MovieApp - Top Rated");
+            return true;
+        }
+        if (id == R.id.menu_sort_playing) {
+            mSortSetting = SortSetting.PLAYING;
+            loadMovies();
+            mMainActivity.setTitle("MovieApp - Now Playing");
+            return true;
+        }
+        if (id == R.id.menu_sort_upcoming) {
+            mSortSetting = SortSetting.UPCOMING;
+            loadMovies();
+            mMainActivity.setTitle("MovieApp - Upcoming");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    // used OKHttp API to send URL and request movie data in JSON
     public void loadMovies(){
         if (mMainActivity.isNetworkAvailable()) {
             Uri.Builder uriBuilder = new Uri.Builder();
 
+            // generate the URL for different sorting based on the setting
+            String sortURL;
+            if(mSortSetting == SortSetting.POPULAR){
+                sortURL = "3/movie/popular";
+            }else if (mSortSetting == SortSetting.RATING){
+                sortURL = "3/movie/top_rated";
+            }else if (mSortSetting == SortSetting.PLAYING){
+                sortURL = "3/movie/now_playing";
+            }else if (mSortSetting == SortSetting.UPCOMING){
+                sortURL = "3/movie/upcoming";
+            }else{
+                sortURL = "3/movie/popular";
+                Toast.makeText(mContext, "Invalid sort setting: default to POPULAR", Toast.LENGTH_SHORT).show();
+            }
+
             uriBuilder.scheme("http")
                         .authority("api.themoviedb.org")
-                        .path("3/movie/popular")
+                        .path(sortURL)
 //                        .path("3/discover/movie")
 //                        .appendQueryParameter("sort_by", "polularity.desc")
 //                        .appendQueryParameter("release_date.gte", getDateString_minus180())
@@ -132,7 +171,7 @@ public class Fragment_movieDisplay extends Fragment {
                         String jsonData = response.body().string();
                         Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
-                            mMainActivity.mMovies = parseMovieDetails(jsonData);
+                            mMovies = parseMovieDetails(jsonData);
                             mMainActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -154,24 +193,7 @@ public class Fragment_movieDisplay extends Fragment {
         }
     }
 
-    // return a date 180 days before in the format of YYYY-MM-DD
-    public String getDateString_minus180(){
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.DATE, -180);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = format.format(date.getTime());
-        return dateString;
-    }
-
-    // return a date in a month later in the format of YYYY-MM-DD
-    public String getDateString_plus30(){
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.DATE, 30);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = format.format(date.getTime());
-        return dateString;
-    }
-
+    // parse the JSON data and store result into MoiveInfo arrays
     public MovieInfo[] parseMovieDetails(String jsonData) throws JSONException{
         JSONObject jo_root = new JSONObject(jsonData);
         JSONArray ja_results = jo_root.getJSONArray("results");
@@ -194,17 +216,36 @@ public class Fragment_movieDisplay extends Fragment {
         return movies;
     }
 
+    // get screen ready: set up adapter and on onClick for the GridView
     public void updateDisplay(){
-        mGridview.setAdapter(new ImageAdapter(mContext, mMainActivity.mMovies));
+        mGridview.setAdapter(new ImageAdapter(mContext, mMovies));
 
         mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(mMainActivity, DetailActivity.class);
-                i.putExtra(MainActivity.MOVIE_INFO, mMainActivity.mMovies[position]);
+                i.putExtra(MainActivity.MOVIE_INFO, mMovies[position]);
 
                 startActivity(i);
             }
         });
+    }
+
+    // return a date 180 days before in the format of YYYY-MM-DD
+    public String getDateString_minus180(){
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.DATE, -180);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = format.format(date.getTime());
+        return dateString;
+    }
+
+    // return a date in a month later in the format of YYYY-MM-DD
+    public String getDateString_plus30(){
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.DATE, 30);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = format.format(date.getTime());
+        return dateString;
     }
 }
