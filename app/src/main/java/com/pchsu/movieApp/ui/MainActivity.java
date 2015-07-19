@@ -5,8 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.data.MovieInfo;
@@ -14,22 +12,28 @@ import com.pchsu.movieApp.data.MovieInfo;
 
 public class MainActivity extends AppCompatActivity {
 
-    public MovieInfo[] mMovies;
     public static String TAG = MainActivity.class.getSimpleName();
     public static final String MOVIE_INFO = "MOVIE_INFO";
+
+    public MovieInfo[] mMovies;
+
+    public enum SortSetting{POPULAR, RATING}
+    public SortSetting mSortSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSortSetting = SortSetting.POPULAR;  // default
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.main_container, new Fragment_movieDisplay())
                     .commit();
         }
     }
-
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -49,9 +53,19 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        if (id == R.id.menu_sort_popular) {
+            Toast.makeText(this, "sort popular", Toast.LENGTH_SHORT);
+            return true;
+        }
+        if (id == R.id.menu_sort_rating) {
+            Toast.makeText(this, "sort rating", Toast.LENGTH_SHORT);
+            return true;
+        }
+
+            return super.onOptionsItemSelected(item);
     }
 
+*/
     public boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);

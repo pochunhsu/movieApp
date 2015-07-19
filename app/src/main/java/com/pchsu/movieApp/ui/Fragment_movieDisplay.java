@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -45,6 +48,12 @@ public class Fragment_movieDisplay extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = getActivity();
@@ -55,6 +64,37 @@ public class Fragment_movieDisplay extends Fragment {
 
         loadMovies();
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.setting_sort) {
+            return true;
+        }
+
+        if (id == R.id.menu_sort_popular) {
+            Toast.makeText(mContext, "sort popular", Toast.LENGTH_SHORT);
+            return true;
+        }
+        if (id == R.id.menu_sort_rating) {
+            Toast.makeText(mContext, "sort rating", Toast.LENGTH_SHORT);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void loadMovies(){
@@ -146,6 +186,8 @@ public class Fragment_movieDisplay extends Fragment {
             movie.setBackDropPath(jo_movie.getString("backdrop_path"));
             movie.setPosterPath(jo_movie.getString("poster_path"));
             movie.setOverview(jo_movie.getString("overview"));
+            movie.setReleaseDate(jo_movie.getString("release_date"));
+            movie.setVote(jo_movie.getDouble("vote_average"));
 
             movies[i] = movie;
         }

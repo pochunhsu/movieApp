@@ -12,4 +12,7 @@
 
     <string name="apiKey"></string>
     <string name="imageUrlPath">http://image.tmdb.org/t/p/w342/</string>
+    <string name="posterImageDescription">poster image</string>
+    <string name="title_background_description">Title background image</string>
+
 </resources>

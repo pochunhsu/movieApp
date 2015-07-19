@@ -50,6 +50,8 @@ public class ImageAdapter extends BaseAdapter {
             image = new ImageView(mContext);
             image.setAdjustViewBounds(true);
             image.setLayoutParams(new GridView.LayoutParams(mImageWidth, mImageHeight));
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
         }else{
             image = (ImageView) convertView;
         }
@@ -58,7 +60,7 @@ public class ImageAdapter extends BaseAdapter {
 
         Picasso.with(mContext)
                 .load(ImageUrl)
-                .resize(mImageWidth, mImageHeight)
+//                .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image
                 .into(image);
         return image;
     }

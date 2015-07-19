@@ -4,10 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class MovieInfo implements Parcelable{
-    String mTitle;
-    String mBackDropPath;
-    String mPosterPath;
-    String mOverview;
+    private String mTitle;           // movie title
+    private String mBackDropPath;    // http path to backdrop
+    private String mPosterPath;      // http path to poster
+    private String mOverview;        // movie description
+    private String mReleaseDate;     // YYYY-MM-DD
+    private double mVote;            // scale: 0-10
 
     public String getTitle() {
         return mTitle;
@@ -41,6 +43,22 @@ public class MovieInfo implements Parcelable{
         this.mOverview = overview;
     }
 
+    public String getReleaseDate() {
+        return mReleaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        mReleaseDate = releaseDate;
+    }
+
+    public double getVote() {
+        return mVote;
+    }
+
+    public void setVote(double vote) {
+        mVote = vote;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -51,6 +69,8 @@ public class MovieInfo implements Parcelable{
         dest.writeString(mTitle);
         dest.writeString(mBackDropPath);
         dest.writeString(mPosterPath);
+        dest.writeString(mReleaseDate);
+        dest.writeDouble(mVote);
         dest.writeString(mOverview);
     }
 
@@ -58,6 +78,8 @@ public class MovieInfo implements Parcelable{
         mTitle = in.readString();
         mBackDropPath = in.readString();
         mPosterPath = in.readString();
+        mReleaseDate = in.readString();
+        mVote = in.readDouble();
         mOverview = in.readString();
     }
 

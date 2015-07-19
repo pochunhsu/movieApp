@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    # weights used in fragment_movie_detail.xml ; total = 100
+    <integer name="topSecWeight">30</integer>
+    <integer name="middleSecWeight">30</integer>
+    <integer name="bottomSecWeight">40</integer>
+</resources>

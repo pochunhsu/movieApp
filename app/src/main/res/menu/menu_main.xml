@@ -12,10 +12,12 @@
           android:title="@string/setting_sort"
           app:showAsAction="ifRoom">
         <menu>
-            <item android:id="@+id/popularSort"
-                  android:title="@string/popularLabel" />
-            <item android:id="@+id/RatingSort"
-                  android:title="@string/ratingLabel" />
+            <item android:id="@+id/menu_sort_popular"
+                  android:title="@string/popularLabel"
+                  />
+            <item android:id="@+id/menu_sort_rating"
+                  android:title="@string/ratingLabel"
+                  />
         </menu>
     </item>>
 </menu>
