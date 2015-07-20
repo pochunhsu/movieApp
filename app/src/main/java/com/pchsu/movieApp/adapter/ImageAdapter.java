@@ -44,6 +44,7 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
         ImageView image;
         String ImageUrl;
         if (convertView == null) {
@@ -52,8 +53,15 @@ public class ImageAdapter extends BaseAdapter {
             image.setLayoutParams(new GridView.LayoutParams(mImageWidth, mImageHeight));
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+            convertView = image;
+
+            holder = new ViewHolder();
+            holder.moviePoster = image;
+
+            convertView.setTag(holder);
         }else{
-            image = (ImageView) convertView;
+            holder = (ViewHolder) convertView.getTag();
+            image = holder.moviePoster;
         }
 
         ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovies[position].getPosterPath();
@@ -62,8 +70,12 @@ public class ImageAdapter extends BaseAdapter {
                 .load(ImageUrl)
                 .placeholder(R.drawable.cloud_download)
                 .error(R.drawable.cloud_error)
-//                .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image
+                .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image
                 .into(image);
-        return image;
+        return convertView;
+    }
+
+    private static class ViewHolder{
+        ImageView moviePoster;
     }
 }

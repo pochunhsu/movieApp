@@ -83,7 +83,7 @@ public class MovieInfo implements Parcelable{
         mOverview = in.readString();
     }
 
-    public MovieInfo(){}
+    public MovieInfo() {}
 
     public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {
         @Override

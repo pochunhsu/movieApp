@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.adapter.ImageAdapter;
 import com.pchsu.movieApp.data.MovieInfo;
+import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -30,8 +31,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 //import android.app.Fragment;
 
@@ -56,7 +55,7 @@ public class Fragment_movieDisplay extends Fragment {
         // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
 
-        mSortSetting = SortSetting.POPULAR;  // default
+
     }
 
     @Override
@@ -68,7 +67,15 @@ public class Fragment_movieDisplay extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_movie_poster, container, false);
         mGridview = (GridView) rootView.findViewById(R.id.gridDisplay);
 
-        loadMovies();
+        // load the movieInfo array from the stored data
+        // if data exists, no reload is required (after screen rotation)
+        if (savedInstanceState == null){
+            mSortSetting = SortSetting.POPULAR;  // default
+            loadMovies();
+        }else{
+            mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray("movies");
+            updateDisplay();
+        }
         return rootView;
     }
 
@@ -120,9 +127,15 @@ public class Fragment_movieDisplay extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArray("movies", mMovies);
+        super.onSaveInstanceState(outState);
+    }
+
     // used OKHttp API to send URL and request movie data in JSON
     public void loadMovies(){
-        if (mMainActivity.isNetworkAvailable()) {
+        if (MovieAppUtility.isNetworkAvailable(mContext)) {
             Uri.Builder uriBuilder = new Uri.Builder();
 
             // generate the URL for different sorting based on the setting
@@ -172,6 +185,7 @@ public class Fragment_movieDisplay extends Fragment {
                         Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
                             mMovies = parseMovieDetails(jsonData);
+
                             mMainActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -231,21 +245,5 @@ public class Fragment_movieDisplay extends Fragment {
         });
     }
 
-    // return a date 180 days before in the format of YYYY-MM-DD
-    public String getDateString_minus180(){
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.DATE, -180);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = format.format(date.getTime());
-        return dateString;
-    }
 
-    // return a date in a month later in the format of YYYY-MM-DD
-    public String getDateString_plus30(){
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.DATE, 30);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = format.format(date.getTime());
-        return dateString;
-    }
 }

@@ -2,8 +2,10 @@ package com.pchsu.movieApp.ui;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.pchsu.movieApp.R;
+import com.pchsu.movieApp.data.MovieInfo;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -24,6 +27,8 @@ public class Fragment_movieDetail extends Fragment{
     private Context mContext;
     private DetailActivity mActivity;
     private Resources mResources;
+
+    private MovieInfo mMovie;
 
     @Bind(R.id.topSection) RelativeLayout mTopSec;
     @Bind(R.id.middleSection) RelativeLayout mMiddleSec;
@@ -42,6 +47,10 @@ public class Fragment_movieDetail extends Fragment{
         mContext = getActivity();
         mActivity = (DetailActivity) mContext;
 
+        Intent intent = mActivity.getIntent();
+        Parcelable parcelable = intent.getParcelableExtra(MainActivity.MOVIE_INFO);
+        mMovie = (MovieInfo) parcelable;
+
         // program the sections' height based on the screen size and the weight integer specified in xml
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
         mResources = getResources();
@@ -57,19 +66,19 @@ public class Fragment_movieDetail extends Fragment{
         mMiddleSec.getLayoutParams().height = middleSecHeight;
 
         // using picasso api to load images from web
-        String ImageUrl = mContext.getString(R.string.imageUrlPath) + mActivity.getMovie().getBackDropPath();
+        String ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getBackDropPath();
         Picasso.with(mContext).load(ImageUrl).into(mTitleImage);
 
-        ImageUrl = mContext.getString(R.string.imageUrlPath) + mActivity.getMovie().getPosterPath();
+        ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterPath();
         Picasso.with(mContext).load(ImageUrl).into(mPosterImage);
 
         // load content into each elements
-        mTitleLabel.setText(mActivity.getMovie().getTitle());
-        mFullTitleLabel.setText(mActivity.getMovie().getTitle());
-        mReleaseDateText.setText(mActivity.getMovie().getReleaseDate());
-        mOverViewText.setText(mActivity.getMovie().getOverview());
+        mTitleLabel.setText(mMovie.getTitle());
+        mFullTitleLabel.setText(mMovie.getTitle());
+        mReleaseDateText.setText(mMovie.getReleaseDate());
+        mOverViewText.setText(mMovie.getOverview());
 
-        double rating = convertRating_10to5(mActivity.getMovie().getVote());
+        double rating = convertRating_10to5(mMovie.getVote());
         mRatingText.setText( rating + " / 5.0");
         mRatingBar.setRating((float)rating);
 
