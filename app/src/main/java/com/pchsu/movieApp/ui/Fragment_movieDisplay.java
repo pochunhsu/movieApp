@@ -44,6 +44,7 @@ public class Fragment_movieDisplay extends Fragment {
     private MovieInfo[] mMovies;
 
     private GridView mGridview;
+    private ImageAdapter mAdapter;
 
     private enum SortSetting{POPULAR, RATING, PLAYING, UPCOMING}
     private SortSetting mSortSetting;
@@ -54,8 +55,6 @@ public class Fragment_movieDisplay extends Fragment {
 
         // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
-
-
     }
 
     @Override
@@ -76,6 +75,7 @@ public class Fragment_movieDisplay extends Fragment {
             mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray("movies");
             updateDisplay();
         }
+
         return rootView;
     }
 
@@ -102,25 +102,25 @@ public class Fragment_movieDisplay extends Fragment {
         if (id == R.id.menu_sort_popular) {
             mSortSetting = SortSetting.POPULAR;
             loadMovies();
-            mMainActivity.setTitle("MovieApp - Popular");
+            mMainActivity.setTitle(R.string.title_popular);
             return true;
         }
         if (id == R.id.menu_sort_rating) {
             mSortSetting = SortSetting.RATING;
             loadMovies();
-            mMainActivity.setTitle("MovieApp - Top Rated");
+            mMainActivity.setTitle(R.string.title_top_rated);
             return true;
         }
         if (id == R.id.menu_sort_playing) {
             mSortSetting = SortSetting.PLAYING;
             loadMovies();
-            mMainActivity.setTitle("MovieApp - Now Playing");
+            mMainActivity.setTitle(R.string.title_now_playing);
             return true;
         }
         if (id == R.id.menu_sort_upcoming) {
             mSortSetting = SortSetting.UPCOMING;
             loadMovies();
-            mMainActivity.setTitle("MovieApp - Upcoming");
+            mMainActivity.setTitle(R.string.title_upcoming);
             return true;
         }
 
@@ -232,7 +232,14 @@ public class Fragment_movieDisplay extends Fragment {
 
     // get screen ready: set up adapter and on onClick for the GridView
     public void updateDisplay(){
-        mGridview.setAdapter(new ImageAdapter(mContext, mMovies));
+
+        // set up a new adapter or use the existing one
+        if (mAdapter == null) {
+            mAdapter = new ImageAdapter(mContext, mMovies);
+            mGridview.setAdapter(mAdapter);
+        }else {
+            mAdapter.setMovies(mMovies);
+        }
 
         mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -244,6 +251,4 @@ public class Fragment_movieDisplay extends Fragment {
             }
         });
     }
-
-
 }

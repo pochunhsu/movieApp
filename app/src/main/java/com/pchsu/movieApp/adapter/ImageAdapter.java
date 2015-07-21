@@ -27,6 +27,12 @@ public class ImageAdapter extends BaseAdapter {
         mImageWidth = metrics.widthPixels/2;
         mImageHeight = (int) (mImageWidth * 1.5);
     }
+
+    public void setMovies(MovieInfo[] movies) {
+        mMovies = movies;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return mMovies.length;
@@ -68,7 +74,7 @@ public class ImageAdapter extends BaseAdapter {
 
         Picasso.with(mContext)
                 .load(ImageUrl)
-                .placeholder(R.drawable.cloud_download)
+//                .placeholder(R.drawable.cloud_download)
                 .error(R.drawable.cloud_error)
                 .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image
                 .into(image);

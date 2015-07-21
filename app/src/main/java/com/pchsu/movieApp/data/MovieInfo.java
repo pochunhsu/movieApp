@@ -83,7 +83,14 @@ public class MovieInfo implements Parcelable{
         mOverview = in.readString();
     }
 
-    public MovieInfo() {}
+    public MovieInfo() {
+        mTitle = "title";
+        mBackDropPath = "";
+        mPosterPath = "";
+        mReleaseDate = "YYYY-MM-DD";
+        mVote = 10;
+        mOverview = "plot";
+    }
 
     public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {
         @Override
