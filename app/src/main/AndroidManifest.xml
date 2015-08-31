@@ -21,7 +21,8 @@
         </activity>
         <activity
             android:name="com.pchsu.movieApp.ui.DetailActivity"
-            android:label="Movie Info"></activity>
+            android:label="Movie Info">
+        </activity>
     </application>
 
 </manifest>

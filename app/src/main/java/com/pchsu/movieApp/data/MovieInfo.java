@@ -4,12 +4,23 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class MovieInfo implements Parcelable{
+
+
+    private int    id;               // movie id
     private String mTitle;           // movie title
     private String mBackDropPath;    // http path to backdrop
     private String mPosterPath;      // http path to poster
     private String mOverview;        // movie description
     private String mReleaseDate;     // YYYY-MM-DD
     private double mVote;            // scale: 0-10
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return mTitle;
