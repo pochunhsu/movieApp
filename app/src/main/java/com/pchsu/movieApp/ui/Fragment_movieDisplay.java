@@ -37,6 +37,7 @@ import java.io.IOException;
 public class Fragment_movieDisplay extends Fragment {
 
     public static final String TAG = "MoviePoster";
+    public static final String TAG_MOVIE_DATA = "MovieData";
 
     private Context mContext;
     private MainActivity mMainActivity;
@@ -67,12 +68,12 @@ public class Fragment_movieDisplay extends Fragment {
         mGridview = (GridView) rootView.findViewById(R.id.gridDisplay);
 
         // load the movieInfo array from the stored data
-        // if data exists, no reload is required (after screen rotation)
+        // if data exists in saveInstanceState, no reload is required (after screen rotation)
         if (savedInstanceState == null){
             mSortSetting = SortSetting.POPULAR;  // default
             loadMovies();
         }else{
-            mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray("movies");
+            mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray(TAG_MOVIE_DATA);
             updateDisplay();
         }
 
@@ -129,7 +130,7 @@ public class Fragment_movieDisplay extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArray("movies", mMovies);
+        outState.putParcelableArray(TAG_MOVIE_DATA, mMovies);
         super.onSaveInstanceState(outState);
     }
 

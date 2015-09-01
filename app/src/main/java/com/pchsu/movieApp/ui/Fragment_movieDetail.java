@@ -41,6 +41,11 @@ public class Fragment_movieDetail extends Fragment{
     @Bind(R.id.releaseDateLabel) TextView mReleaseDateText;
     @Bind(R.id.overviewLabel) TextView mOverViewText;
 
+    public static Fragment_movieDetail newInstance() {
+        Fragment_movieDetail fragment = new Fragment_movieDetail();
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

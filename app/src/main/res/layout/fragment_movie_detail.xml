@@ -51,10 +51,10 @@
         android:layout_below="@+id/topSection"
         android:background="@drawable/detail_gradient">
 
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            >
+            android:layout_height="200dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -71,8 +71,8 @@
                     android:layout_alignParentStart="true"
                     android:src = "@drawable/sample_poster"
                     android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
+                    android:layout_marginTop="2dp"
                     android:contentDescription="@string/posterImageDescription"/>
 
                 <TextView
@@ -119,10 +119,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/overviewLabel"
-                    android:layout_margin="10dp"
                     android:textSize="16sp"
-                    tools:text = "descriptions ..."
-                    android:layout_below="@+id/middleSection"/>
+                    android:layout_below="@+id/middleSection"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    tools:text = "descriptions ... \n1234567890\n 0987654321\n"/>
 
         </RelativeLayout>
     </ScrollView>
