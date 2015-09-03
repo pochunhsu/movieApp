@@ -6,6 +6,7 @@
     <string name="title_now_playing">MovieApp - Now Playing</string>
     <string name="title_upcoming">MovieApp - upcoming</string>
 
+    <string name="search_title">Search</string>
     <string name="setting_sort">Sort By</string>
     <string name="setting_search">Search</string>
     <string name="popularLabel">Popular</string>
