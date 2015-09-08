@@ -22,9 +22,11 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
-    public void alertUserAboutError() {
+    public void alertUserAboutError(String error_msg) {
         AlertDialogFragment dialog = new AlertDialogFragment();
-        dialog.show(getFragmentManager(), "error_dialog");
+        Bundle args = new Bundle();
+        args.putString(AlertDialogFragment.ERR_MSG_TAG, error_msg);
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), AlertDialogFragment.ERR_MSG_TAG);
     }
 }

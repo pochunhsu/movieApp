@@ -2,11 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
-    <item android:id="@+id/option_search"
+    <item android:id="@+id/movie_search"
           android:title="@+id/search_title"
           android:icon="@drawable/ic_search_white_48dp"
           app:showAsAction="collapseActionView|ifRoom"
-          android:actionViewClass="android.widget.SearchView" />
+          app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item android:id="@+id/setting_sort"
           android:icon="@drawable/ic_sort_white_48dp"
@@ -21,6 +21,8 @@
                   android:title="@string/playingLabel"/>
             <item android:id="@+id/menu_sort_upcoming"
                   android:title="@string/upcomingLabel"/>
+            <item android:id="@+id/menu_favorite"
+                  android:title="@string/favoriteLabel"/>
         </menu>
     </item>>
 </menu>

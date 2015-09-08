@@ -6,12 +6,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.pchsu.movieApp.ui.Fragment_movieDetail;
-import com.pchsu.movieApp.ui.Fragment_movieReview;
-import com.pchsu.movieApp.ui.Fragment_movieTrailer;
+import com.pchsu.movieApp.ui.Fragment_movieDetail_more;
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    final int PAGE_COUNT = 3;
-    private String mTabTitles[] = new String[] { "Overview", "Trailer", "Review" };
+    final int PAGE_COUNT = 2;
+    private String mTabTitles[] = new String[] { "Synopsis", "Trailer & Review"};
     private Context mContext;
 
     public PagerAdapter(FragmentManager fm, Context context) {
@@ -29,8 +28,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = null;
         switch(position){
             case 0: fragment = Fragment_movieDetail.newInstance(); break;
-            case 1: fragment = Fragment_movieTrailer.newInstance(); break;
-            case 2: fragment = Fragment_movieReview.newInstance(); break;
+            case 1: fragment = Fragment_movieDetail_more.newInstance(); break;
         }
         return fragment;
     }

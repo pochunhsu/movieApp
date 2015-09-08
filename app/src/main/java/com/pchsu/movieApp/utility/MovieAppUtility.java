@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MovieAppUtility {
+    public static final String TAG = MovieAppUtility.class.getSimpleName();
 
     // return a date 180 days before in the format of YYYY-MM-DD
     public static String getDateString_minus180(){

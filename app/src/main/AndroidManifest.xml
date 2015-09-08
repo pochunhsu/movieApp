@@ -14,6 +14,7 @@
             android:name="com.pchsu.movieApp.ui.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,6 +24,8 @@
             android:name="com.pchsu.movieApp.ui.DetailActivity"
             android:label="Movie Info">
         </activity>
+        <provider
+            android:name=".data.FavoriteMovieProvider"
+            android:authorities="com.pchsu.movieApp"/>
     </application>
-
 </manifest>

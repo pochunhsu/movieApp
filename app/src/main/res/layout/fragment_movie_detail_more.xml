@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linearView"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Play Trailer 1"
+            android:id="@+id/button_trailer1"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:visibility="invisible" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Play Trailer 2"
+            android:id="@+id/button_trailer2"
+            android:layout_weight="1"
+            android:layout_margin="5dp"
+            android:textSize="18sp"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/detail_gradient"
+        android:layout_below="@+id/linearView"
+        android:id="@android:id/list"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:divider="@null"
+        android:dividerHeight="2dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/label_noReview"
+        android:textSize="25sp"
+        android:text="No Reviews in database."
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

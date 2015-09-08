@@ -113,13 +113,36 @@
                     tools:text = "2015-05-23"
                     android:layout_margin="5dp"
                     android:layout_toRightOf="@+id/posterImage"/>
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/button_heart_full"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="heart full; click to unfavorite"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/heart_full"
+                    android:visibility="invisible"/>
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/button_heart_empty"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="heart empty; click to favorite"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/heart_empty"
+                    android:visibility="visible"/>
             </RelativeLayout>
 
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/overviewLabel"
-                    android:textSize="16sp"
+                    android:textSize="20sp"
                     android:layout_below="@+id/middleSection"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/review_item"
+    android:focusable="false"
+    android:background="@drawable/review_gradient">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_author"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="5dp"
+        android:textSize="15sp"
+        android:text="author&apos;s name"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_review"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/text_author"
+        android:textSize="20dp"
+        android:text="Movie review text conent is here."
+        android:textColor="@android:color/white" />
+</RelativeLayout>

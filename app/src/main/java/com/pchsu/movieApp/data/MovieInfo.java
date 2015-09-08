@@ -2,24 +2,27 @@ package com.pchsu.movieApp.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.util.Pair;
 
 public class MovieInfo implements Parcelable{
 
-
-    private int    id;               // movie id
+    private int    mId;               // movie id
     private String mTitle;           // movie title
     private String mBackDropPath;    // http path to backdrop
     private String mPosterPath;      // http path to poster
     private String mOverview;        // movie description
     private String mReleaseDate;     // YYYY-MM-DD
     private double mVote;            // scale: 0-10
+    private String[] mTrailerLinks;  // string arrays of youtube path
+    private Pair[] mReviews;         // pair of strings [author, review content]
+    private boolean favorite;
 
     public int getId() {
-        return id;
+        return mId;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.mId = id;
     }
 
     public String getTitle() {
@@ -70,6 +73,30 @@ public class MovieInfo implements Parcelable{
         mVote = vote;
     }
 
+    public String[] getTrailerLinks() {
+        return mTrailerLinks;
+    }
+
+    public void setTrailerLinks(String[] trailerLinks) {
+        mTrailerLinks = trailerLinks;
+    }
+
+    public Pair[] getReviews() {
+        return mReviews;
+    }
+
+    public void setReviews(Pair[] reviews) {
+        mReviews = reviews;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -77,6 +104,7 @@ public class MovieInfo implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mId);
         dest.writeString(mTitle);
         dest.writeString(mBackDropPath);
         dest.writeString(mPosterPath);
@@ -86,6 +114,7 @@ public class MovieInfo implements Parcelable{
     }
 
     private MovieInfo (Parcel in){
+        mId = in.readInt();
         mTitle = in.readString();
         mBackDropPath = in.readString();
         mPosterPath = in.readString();
@@ -95,12 +124,15 @@ public class MovieInfo implements Parcelable{
     }
 
     public MovieInfo() {
-        mTitle = "title";
+        mId = 0;
+        mTitle = "default_title";
         mBackDropPath = "";
         mPosterPath = "";
         mReleaseDate = "YYYY-MM-DD";
         mVote = 10;
         mOverview = "plot";
+        mTrailerLinks = null;
+        mReviews = null;
     }
 
     public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {
