@@ -78,10 +78,10 @@ public class ImageAdapter extends BaseAdapter {
             image = holder.moviePoster;
         }
 
-        ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovies[position].getPosterPath();
+        //ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovies[position].getPosterUrl();
 
         Picasso.with(mContext)
-                .load(ImageUrl)
+                .load(mMovies[position].getPosterUrl())
 //                .placeholder(R.drawable.cloud_download)
                 .error(R.drawable.cloud_error)
                 .resize(mImageWidth, mImageHeight) // no need; already set scaleType for image

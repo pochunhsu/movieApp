@@ -6,16 +6,17 @@ import android.support.v4.util.Pair;
 
 public class MovieInfo implements Parcelable{
 
-    private int    mId;               // movie id
+    private int    mId;              // movie id
     private String mTitle;           // movie title
-    private String mBackDropPath;    // http path to backdrop
-    private String mPosterPath;      // http path to poster
+    private String mBackDropUrl;     // http path to backdrop
+    private String mPosterUrl;       // http path to poster
     private String mOverview;        // movie description
     private String mReleaseDate;     // YYYY-MM-DD
     private double mVote;            // scale: 0-10
     private String[] mTrailerLinks;  // string arrays of youtube path
     private Pair[] mReviews;         // pair of strings [author, review content]
-    private boolean favorite;
+    //private boolean mFavorite;     // no need to maintain this attribute
+                                     // all instances from the content provider is favorite
 
     public int getId() {
         return mId;
@@ -33,20 +34,20 @@ public class MovieInfo implements Parcelable{
         this.mTitle = title;
     }
 
-    public String getBackDropPath() {
-        return mBackDropPath;
+    public String getBackDropUrl() {
+        return mBackDropUrl;
     }
 
-    public void setBackDropPath(String backDropPath) {
-        this.mBackDropPath = backDropPath;
+    public void setBackDropUrl(String backDropUrl) {
+        this.mBackDropUrl = backDropUrl;
     }
 
-    public String getPosterPath() {
-        return mPosterPath;
+    public String getPosterUrl() {
+        return mPosterUrl;
     }
 
-    public void setPosterPath(String posterPath) {
-        this.mPosterPath = posterPath;
+    public void setPosterUrl(String posterUrl) {
+        this.mPosterUrl = posterUrl;
     }
 
     public String getOverview() {
@@ -89,13 +90,13 @@ public class MovieInfo implements Parcelable{
         mReviews = reviews;
     }
 
-    public boolean isFavorite() {
-        return favorite;
+   /* public boolean isFavorite() {
+        return mFavorite;
     }
 
     public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
+        mFavorite = favorite;
+    }*/
 
     @Override
     public int describeContents() {
@@ -106,33 +107,36 @@ public class MovieInfo implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(mId);
         dest.writeString(mTitle);
-        dest.writeString(mBackDropPath);
-        dest.writeString(mPosterPath);
+        dest.writeString(mBackDropUrl);
+        dest.writeString(mPosterUrl);
         dest.writeString(mReleaseDate);
         dest.writeDouble(mVote);
         dest.writeString(mOverview);
+        //dest.writeByte((byte)(mFavorite? 1:0));
     }
 
     private MovieInfo (Parcel in){
         mId = in.readInt();
         mTitle = in.readString();
-        mBackDropPath = in.readString();
-        mPosterPath = in.readString();
+        mBackDropUrl = in.readString();
+        mPosterUrl = in.readString();
         mReleaseDate = in.readString();
         mVote = in.readDouble();
         mOverview = in.readString();
+        //mFavorite = in.readByte()!=0 ;
     }
 
     public MovieInfo() {
         mId = 0;
         mTitle = "default_title";
-        mBackDropPath = "";
-        mPosterPath = "";
+        mBackDropUrl = "";
+        mPosterUrl = "";
         mReleaseDate = "YYYY-MM-DD";
         mVote = 10;
         mOverview = "plot";
         mTrailerLinks = null;
         mReviews = null;
+        //mFavorite = false;
     }
 
     public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {

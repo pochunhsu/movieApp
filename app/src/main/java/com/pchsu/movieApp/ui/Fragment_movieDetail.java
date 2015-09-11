@@ -28,6 +28,8 @@ import com.pchsu.movieApp.data.MovieInfo;
 import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -88,11 +90,11 @@ public class Fragment_movieDetail extends Fragment{
         mMiddleSec.getLayoutParams().height = middleSecHeight;
 
         // using picasso api to load images from web
-        String ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getBackDropPath();
-        Picasso.with(mContext).load(ImageUrl).into(mTitleImage);
+        //String ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getBackDropUrl();
+        Picasso.with(mContext).load(mMovie.getBackDropUrl()).into(mTitleImage);
 
-        ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterPath();
-        Picasso.with(mContext).load(ImageUrl).into(mPosterImage);
+        //ImageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterUrl();
+        Picasso.with(mContext).load(mMovie.getPosterUrl()).into(mPosterImage);
 
         // load content into each elements
         mTitleLabel.setText(mMovie.getTitle());
@@ -105,14 +107,14 @@ public class Fragment_movieDetail extends Fragment{
         mRatingBar.setRating((float) rating);
 
         // check the content provider and display the favorite button accordingly
-
+        // TODO: adding a favorite attribute in MovieInfo class for quicker check (w/o provider)?
         Cursor cursor = mResolver.query(FavoriteEntry.CONTENT_URI,
                                         null,
                                         FavoriteEntry.COLUMN_ID + "=?",
                                         new String[]{mMovie.getId() + ""},
                                         null);
         if (cursor.getCount() ==0){
-            Log.d(FavoriteMovieProvider.TAG, "query gets no raws");
+            Log.d(FavoriteMovieProvider.TAG, "query gets no rows");
             mButtonHeartFull.setVisibility(View.INVISIBLE);
             mButtonHeartEmpty.setVisibility(View.VISIBLE);
         }else{
@@ -129,8 +131,8 @@ public class Fragment_movieDetail extends Fragment{
                 ContentValues values = new ContentValues();
                 values.put(FavoriteEntry.COLUMN_ID, mMovie.getId());
                 values.put(FavoriteEntry.COLUMN_TITLE, mMovie.getTitle());
-                values.put(FavoriteEntry.COLUMN_BACKDROP, mMovie.getBackDropPath());
-                values.put(FavoriteEntry.COLUMN_POSTER, mMovie.getPosterPath());
+                values.put(FavoriteEntry.COLUMN_BACKDROP, mMovie.getBackDropUrl());
+                values.put(FavoriteEntry.COLUMN_POSTER, mMovie.getPosterUrl());
                 values.put(FavoriteEntry.COLUMN_OVERVIEW, mMovie.getOverview());
                 values.put(FavoriteEntry.COLUMN_RELEASEDATE, mMovie.getReleaseDate());
                 values.put(FavoriteEntry.COLUMN_VOTE, mMovie.getVote());
@@ -141,18 +143,22 @@ public class Fragment_movieDetail extends Fragment{
                 mButtonHeartEmpty.setVisibility(View.INVISIBLE);
                 mButtonHeartFull.setVisibility(View.VISIBLE);
 
-                // store poster image into external storage
+                // store poster and backdrop image into external storage
                 if ( ! MovieAppUtility.isExternalStorageWritable()){
                     mActivity.alertUserAboutError("No access to external storage for storing poster image!");
                 }else if ( ! MovieAppUtility.isNetworkAvailable(mContext)){
                     mActivity.alertUserAboutError("No access to internet for downloading poster image!");
                 }else{
-                    String imageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterPath();
-                    MovieAppUtility.downloadImageFile(mContext, imageUrl,mMovie.getId()+".jpg");
+                    //String imageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterUrl();
+                    File f_poster = MovieAppUtility.downloadImageFile(mContext, mMovie.getPosterUrl(), mMovie.getId() + "-p.jpg");
+                    File f_backdrop = MovieAppUtility.downloadImageFile(mContext, mMovie.getBackDropUrl(), mMovie.getId() + "-b.jpg");
+
+                    mMovie.setPosterUrl(f_poster.toString());
+                    mMovie.setBackDropUrl(f_backdrop.toString());
                 }
             }
         });
-        // unfavorite: remove the raw in the content provider by movie's id
+        // un-favorite: remove the raw in the content provider by movie's id
         mButtonHeartFull.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,6 +171,10 @@ public class Fragment_movieDetail extends Fragment{
                 }
                 mButtonHeartFull.setVisibility(View.INVISIBLE);
                 mButtonHeartEmpty.setVisibility(View.VISIBLE);
+                if (MovieAppUtility.isExternalStorageWritable()){
+                    MovieAppUtility.deleteImageFile(mContext,mMovie.getId()+"-p.jpg");
+                    MovieAppUtility.deleteImageFile(mContext,mMovie.getId()+"-b.jpg");
+                }
             }
         });
 

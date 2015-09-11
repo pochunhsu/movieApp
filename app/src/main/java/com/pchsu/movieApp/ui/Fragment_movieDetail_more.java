@@ -35,8 +35,6 @@ import java.io.IOException;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static junit.framework.Assert.assertNotNull;
-
 public class Fragment_movieDetail_more extends ListFragment {
 
     public static final String TAG = Fragment_movieDetail_more.class.getSimpleName();
@@ -48,7 +46,8 @@ public class Fragment_movieDetail_more extends ListFragment {
     private MovieInfo mMovie;
 
     private Button[] mButtonTrailer;
-    @Bind(R.id.label_noReview) TextView mlabel_noReview;
+    @Bind(R.id.label_noData) TextView mLabel_noData;
+    @Bind(R.id.button_refresh) TextView mButton_refresh;
 
     public static Fragment_movieDetail_more newInstance() {
         Fragment_movieDetail_more fragment = new Fragment_movieDetail_more();
@@ -72,20 +71,38 @@ public class Fragment_movieDetail_more extends ListFragment {
 
         // inflate the view and instantiate all elements
         mRootView = inflater.inflate(R.layout.fragment_movie_detail_more, container, false);
-
         ButterKnife.bind(this, mRootView);
+
         mButtonTrailer = new Button[2];
         mButtonTrailer[0] = (Button) mRootView.findViewById(R.id.button_trailer1);
         mButtonTrailer[1] = (Button) mRootView.findViewById(R.id.button_trailer2);
 
-        loadTrailerAndReview(mMovie.getId());
+        mButton_refresh = (Button) mRootView.findViewById(R.id.button_refresh);
+        mButton_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MovieAppUtility.isNetworkAvailable(mContext)) {
+                    mButton_refresh.setVisibility(View.INVISIBLE);
+                    loadTrailerAndReview(mMovie.getId());
+                }
+            }
+        });
 
+        if (MovieAppUtility.isNetworkAvailable(mContext)){
+            mButton_refresh.setVisibility(View.INVISIBLE);
+            loadTrailerAndReview(mMovie.getId());
+        }else{
+            mLabel_noData.setVisibility(View.VISIBLE);
+            mLabel_noData.setText("No internet access");
+            //Activity.alertUserAboutError("Network is unavailable !");
+            mButton_refresh.setVisibility(View.VISIBLE);
+        }
         return mRootView;
     }
 
     // used OKHttp API to send URL and request movie data in JSON
     private boolean loadTrailerAndReview(int id){
-        if (MovieAppUtility.isNetworkAvailable(mContext) == false) {
+        if (! MovieAppUtility.isNetworkAvailable(mContext)) {
             return false;
         }
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -146,13 +163,13 @@ public class Fragment_movieDetail_more extends ListFragment {
 
         // parsing JSON for trailer links
         String[] tubeLinks = new String [ja_videos.length()];
-        int trailer_cnt =0;
+        int trailer_cnt =0; // some videos are not trailer; use this var to count REAL trailers
         for(int i =0; i< ja_videos.length(); i++){
             JSONObject jo_video = ja_videos.getJSONObject(i);
 
             if (jo_video.getString("type").equals("Trailer")) {
                 tubeLinks[trailer_cnt] = jo_video.getString("source");
-                assertNotNull("trailer link null", tubeLinks[trailer_cnt]);
+                //assertNotNull("trailer link null", tubeLinks[trailer_cnt]);
                 trailer_cnt++;
             }
         }
@@ -199,14 +216,17 @@ public class Fragment_movieDetail_more extends ListFragment {
         }
 
         // set up ListView of reviews
-        if(mMovie.getReviews() != null) {
-            mlabel_noReview.setVisibility(View.INVISIBLE);
+        if(mMovie.getReviews() == null) {
+            Log.v(TAG, " Request got no reviews!");
+            mLabel_noData.setVisibility(View.VISIBLE);
+            mLabel_noData.setText("No reviews in the database");
+        }else{
+            mLabel_noData.setVisibility(View.INVISIBLE);
             ReviewListAdapter adapter = new ReviewListAdapter(mContext, mMovie.getReviews());
             setListAdapter(adapter);
-        }else{
-            Log.v(TAG, " Request got no reviews!");
         }
 
+        // TODO: check if this is doing anything; to remove is not in use
         // set up the shareIntent
         Intent shareIntent = createShareIntent();
         if (shareIntent!=null) {
@@ -224,22 +244,4 @@ public class Fragment_movieDetail_more extends ListFragment {
         shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + mMovie.getTrailerLinks()[0]);
         return shareIntent;
     }
-
-    /*
-    private void updateDisplay (){
-        final VideoView mVideoView = (VideoView) getActivity().findViewById(R.id.trailer_view);
-        mVideoView.setVideoPath("http://techslides.com/demos/sample-videos/small.mp4");
-        Log.v(TAG, "updateDisplay");
-        MediaController mediaController = new MediaController(getActivity());
-        mediaController.setAnchorView(mVideoView);
-        mVideoView.setMediaController(mediaController);
-        mVideoView.requestFocus();
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                mVideoView.start();
-            }
-        });
-    }
-    */
 }

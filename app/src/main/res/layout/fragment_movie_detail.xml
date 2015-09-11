@@ -124,7 +124,8 @@
                     android:contentDescription="heart full; click to unfavorite"
                     android:layout_marginRight="10dp"
                     android:background="@drawable/heart_full"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    android:clickable="true"/>
                 <ImageButton
                     android:layout_width="40dp"
                     android:layout_height="40dp"
@@ -135,7 +136,8 @@
                     android:contentDescription="heart empty; click to favorite"
                     android:layout_marginRight="10dp"
                     android:background="@drawable/heart_empty"
-                    android:visibility="visible"/>
+                    android:visibility="visible"
+                    android:clickable="true"/>
             </RelativeLayout>
 
             <TextView

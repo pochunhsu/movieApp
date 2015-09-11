@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.adapter.ImageAdapter;
@@ -158,12 +157,13 @@ public class Fragment_movieDisplay extends Fragment {
                 break;
         }
 
+        // TODO: refactor this part to make it clean
         if (uri_path == null) {
             Log.e(TAG, " Menu option gets null uri !");
         }else if (uri_path.equals("favorite")){
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
-            int cnt = cursor.getCount();
-            Toast.makeText(mContext, "Total Vavorite = " + cnt, Toast.LENGTH_LONG).show();
+            mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+            updateDisplay();
         }else{
             Uri.Builder uriBuilder = new Uri.Builder();
             uriBuilder.scheme("http")
@@ -185,7 +185,7 @@ public class Fragment_movieDisplay extends Fragment {
 
     // used OKHttp API to send URL and request movie data in JSON
     private boolean loadMovies(Uri uri){
-        if (MovieAppUtility.isNetworkAvailable(mContext) == false) {
+        if (! MovieAppUtility.isNetworkAvailable(mContext)) {
             return false;
         }
 
@@ -244,8 +244,8 @@ public class Fragment_movieDisplay extends Fragment {
 
             movie.setId(jo_movie.getInt("id"));
             movie.setTitle(jo_movie.getString("title"));
-            movie.setBackDropPath(jo_movie.getString("backdrop_path"));
-            movie.setPosterPath(jo_movie.getString("poster_path"));
+            movie.setBackDropUrl(mContext.getString(R.string.imageUrlPath) + jo_movie.getString("backdrop_path"));
+            movie.setPosterUrl(mContext.getString(R.string.imageUrlPath) + jo_movie.getString("poster_path"));
             movie.setOverview(jo_movie.getString("overview"));
             movie.setReleaseDate(jo_movie.getString("release_date"));
             movie.setVote(jo_movie.getDouble("vote_average"));
