@@ -157,10 +157,8 @@ public class Fragment_movieDisplay extends Fragment {
                 break;
         }
 
-        // TODO: refactor this part to make it clean
-        if (uri_path == null) {
-            Log.e(TAG, " Menu option gets null uri !");
-        }else if (uri_path.equals("favorite")){
+        // TODO: refactor this part to make it cleaner
+        if (uri_path.equals("favorite")){
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
             mMovies = MovieAppUtility.convertCursorToMovies(cursor);
             updateDisplay();
@@ -271,7 +269,6 @@ public class Fragment_movieDisplay extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(mMainActivity, DetailActivity.class);
                 i.putExtra(MainActivity.MOVIE_INFO, mMovies[position]);
-
                 startActivity(i);
             }
         });
