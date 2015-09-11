@@ -25,6 +25,7 @@ import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.data.FavoriteMovieProvider;
 import com.pchsu.movieApp.data.MovieContract.FavoriteEntry;
 import com.pchsu.movieApp.data.MovieInfo;
+import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -120,9 +121,11 @@ public class Fragment_movieDetail extends Fragment{
         }
 
         // add favorite: store information to the content provider
+        //               store poster image to the external storage (SD card)
         mButtonHeartEmpty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // use resolver to store data into content provider
                 ContentValues values = new ContentValues();
                 values.put(FavoriteEntry.COLUMN_ID, mMovie.getId());
                 values.put(FavoriteEntry.COLUMN_TITLE, mMovie.getTitle());
@@ -133,8 +136,20 @@ public class Fragment_movieDetail extends Fragment{
                 values.put(FavoriteEntry.COLUMN_VOTE, mMovie.getVote());
 
                 mResolver.insert(FavoriteEntry.CONTENT_URI, values);
+
+                // toggle the image button
                 mButtonHeartEmpty.setVisibility(View.INVISIBLE);
                 mButtonHeartFull.setVisibility(View.VISIBLE);
+
+                // store poster image into external storage
+                if ( ! MovieAppUtility.isExternalStorageWritable()){
+                    mActivity.alertUserAboutError("No access to external storage for storing poster image!");
+                }else if ( ! MovieAppUtility.isNetworkAvailable(mContext)){
+                    mActivity.alertUserAboutError("No access to internet for downloading poster image!");
+                }else{
+                    String imageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterPath();
+                    MovieAppUtility.downloadImageFile(mContext, imageUrl,mMovie.getId()+".jpg");
+                }
             }
         });
         // unfavorite: remove the raw in the content provider by movie's id
