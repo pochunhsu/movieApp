@@ -57,6 +57,8 @@ public class Fragment_movieDisplay extends Fragment {
     private int mLastSortSetting;
     private SharedPreferences mChangeInFavorite;
     private boolean mOnCreatedViewCalled = false;
+    private boolean mLoadSuccessFlag = false;
+
     // callback interface
     private Communication mCallBack;
 
@@ -115,27 +117,25 @@ public class Fragment_movieDisplay extends Fragment {
         // so have it delayed to this time point
         if (savedInstanceState == null) {
             if (MovieAppUtility.isNetworkAvailable(mContext)) {
-                mMainActivity.setTitle(R.string.title_popular);
+
                 Uri.Builder uriBuilder = new Uri.Builder();
                 uriBuilder.scheme("http")
                         .authority("api.themoviedb.org")
                         .path("3/movie/popular")
                         .appendQueryParameter("api_key", getString(R.string.apiKey));
                 Uri uri = uriBuilder.build();
-                loadMovies(uri);
                 mLastSortSetting = R.id.menu_sort_popular;
-
+                loadMovies(uri);
             }else{
                 // load the favorite when no network
                 Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
                 mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+                mLastSortSetting = R.id.menu_favorite;
                 updateDisplay();
 
-                if (mMovies == null){
+                if (mMovies == null) {
                     mLabel_noMovie.setText("No Network and No Local Favorite");
                     mLabel_noMovie.setVisibility(View.VISIBLE);
-                }else{
-                    mMainActivity.setTitle(R.string.title_favorite);
                 }
             }
         }
@@ -187,7 +187,7 @@ public class Fragment_movieDisplay extends Fragment {
                         .appendQueryParameter("api_key", getString(R.string.apiKey));
                 Uri uri = uriBuilder.build();
                 loadMovies(uri);
-                mMainActivity.setTitle("MovieApp " + query);
+                mMainActivity.setTitle("MovieApp - " + query);
                 return false;
             }
 
@@ -216,23 +216,18 @@ public class Fragment_movieDisplay extends Fragment {
                 break;
             case R.id.menu_sort_popular:
                 uri_path = "3/movie/popular";
-                mMainActivity.setTitle(R.string.title_popular);
                 break;
             case R.id.menu_sort_rating:
                 uri_path = "3/movie/top_rated";
-                mMainActivity.setTitle(R.string.title_top_rated);
                 break;
             case R.id.menu_sort_playing:
                 uri_path = "3/movie/now_playing";
-                mMainActivity.setTitle(R.string.title_now_playing);
                 break;
             case R.id.menu_sort_upcoming:
                 uri_path = "3/movie/upcoming";
-                mMainActivity.setTitle(R.string.title_upcoming);
                 break;
             case R.id.menu_favorite:
                 uri_path = "favorite";  // a hack; the code will get the uri to content provider
-                mMainActivity.setTitle(R.string.title_favorite);
                 break;
             default:
                 uri_path = "?";
@@ -245,7 +240,6 @@ public class Fragment_movieDisplay extends Fragment {
             mMovies = MovieAppUtility.convertCursorToMovies(cursor);
             mLastSortSetting = id;
             updateDisplay();
-
         } else {
             Uri.Builder uriBuilder = new Uri.Builder();
             uriBuilder.scheme("http")
@@ -272,8 +266,8 @@ public class Fragment_movieDisplay extends Fragment {
             mCallBack.alertUserAboutError("No Network Access !");
             return false;
         }
-
         Log.v(TAG, uri.toString());
+        mLoadSuccessFlag = false;
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -295,7 +289,6 @@ public class Fragment_movieDisplay extends Fragment {
                     Log.v(TAG, jsonData);
                     if (response.isSuccessful()) {
                         mMovies = parseMovieDetails(jsonData);
-
                         mMainActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -345,6 +338,8 @@ public class Fragment_movieDisplay extends Fragment {
     // get screen ready: set up adapter and on onClick for the GridView
     private void updateDisplay() {
         if (mOnCreatedViewCalled != true) return;
+
+        updateTitle();
 
         // if no movies to display, hide the gridView
         if (mMovies == null ){
@@ -400,6 +395,9 @@ public class Fragment_movieDisplay extends Fragment {
         }else{
             // additional functionality for http renew can be added here
         }
+    }
+    private void updateTitle(){
+        mMainActivity.setTitle("MoiveApp - " + SortRId2String(mLastSortSetting));
     }
 
     public MovieInfo getDefaultMovie(){

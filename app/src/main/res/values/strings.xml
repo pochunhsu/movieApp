@@ -27,6 +27,6 @@
     <string name="title_background_description">Title background image</string>
 
     <!-- themoviedb api key-->
-    <string name="apiKey"></string>
+    <string name="apiKey">eaf6d9fd9f4deabd752e6f00f0227164</string>
 
 </resources>
