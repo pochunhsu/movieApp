@@ -1,8 +1,8 @@
 package com.pchsu.movieApp.ui;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,11 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.adapter.ImageAdapter;
 import com.pchsu.movieApp.data.MovieContract;
 import com.pchsu.movieApp.data.MovieInfo;
+import com.pchsu.movieApp.utility.Communication;
 import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -35,7 +37,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-//import android.app.Fragment;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class Fragment_movieDisplay extends Fragment {
 
@@ -47,9 +50,25 @@ public class Fragment_movieDisplay extends Fragment {
     private ContentResolver mResolver;
 
     private MovieInfo[] mMovies;
-
-    private GridView mGridview;
     private ImageAdapter mAdapter;
+
+    private int mLastSortSetting;
+
+    private boolean mIsActivityCreated;
+    // callback interface
+    private Communication mCallBack;
+
+    @Bind(R.id.gridDisplay) GridView mGridview;
+    @Bind(R.id.label_noMovie) TextView mLabel_noMovie;
+
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallBack = (Communication) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + "must implement Communication!");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +77,7 @@ public class Fragment_movieDisplay extends Fragment {
         mContext = getActivity();
         mMainActivity = (MainActivity) mContext;
         mResolver = mContext.getContentResolver();
+        mIsActivityCreated = false;
 
         // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
@@ -68,25 +88,63 @@ public class Fragment_movieDisplay extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_poster, container, false);
-        mGridview = (GridView) rootView.findViewById(R.id.gridDisplay);
+        ButterKnife.bind(this, rootView);
 
         // load the movieInfo array from the stored data
         // if data exists in saveInstanceState, no reload is required (after screen rotation)
-        if (savedInstanceState == null){
-            mMainActivity.setTitle(R.string.title_popular);
-            Uri.Builder uriBuilder = new Uri.Builder();
-            uriBuilder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .path("3/movie/popular")
-                    .appendQueryParameter("api_key", getString(R.string.apiKey));
-            Uri uri = uriBuilder.build();
-            loadMovies(uri);
-        }else{
+        if (savedInstanceState == null) {
+            // do nothing
+            // postpone the work to onActivityCreated
+            // because work need to be serialized with inTwoPane in Activity.OnCreate
+        } else {
+            // regain the movie data from the saved state
             mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray(TAG_MOVIE_DATA);
             updateDisplay();
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mIsActivityCreated = true;
+        // loadMovies.updateDisplay needs to check pane layout setting
+        // so have it delayed to this time point
+        if (savedInstanceState == null) {
+            if (MovieAppUtility.isNetworkAvailable(mContext)) {
+                mMainActivity.setTitle(R.string.title_popular);
+                Uri.Builder uriBuilder = new Uri.Builder();
+                uriBuilder.scheme("http")
+                        .authority("api.themoviedb.org")
+                        .path("3/movie/popular")
+                        .appendQueryParameter("api_key", getString(R.string.apiKey));
+                Uri uri = uriBuilder.build();
+                loadMovies(uri);
+                mLastSortSetting = R.id.menu_sort_popular;
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        // force refresh in favorite mode in case a movie gets removed from favorite
+        super.onResume();
+        if (mLastSortSetting == R.id.menu_favorite ||
+            ! MovieAppUtility.isNetworkAvailable(mContext)) {
+            Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
+            mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+            updateDisplay();
+
+            if (mMovies == null){
+                String str = "";
+                if (! MovieAppUtility.isNetworkAvailable(mContext)) {
+                    str = "No Network and ";
+                }
+                mLabel_noMovie.setText(str + "No Local Favorite");
+                mLabel_noMovie.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
@@ -130,15 +188,19 @@ public class Fragment_movieDisplay extends Fragment {
         int id = item.getItemId();
         String uri_path = null;
 
+        // skip the update if the setting is the same as the old one
+        if (mLastSortSetting == id) return super.onOptionsItemSelected(item);
+
         //noinspection SimplifiableIfStatement
-        switch (id){
-            case R.id.setting_sort: break;
+        switch (id) {
+            case R.id.setting_sort:
+                break;
             case R.id.menu_sort_popular:
                 uri_path = "3/movie/popular";
                 mMainActivity.setTitle(R.string.title_popular);
                 break;
             case R.id.menu_sort_rating:
-                uri_path = "3/movie/upcoming";
+                uri_path = "3/movie/top_rated";
                 mMainActivity.setTitle(R.string.title_top_rated);
                 break;
             case R.id.menu_sort_playing:
@@ -154,15 +216,18 @@ public class Fragment_movieDisplay extends Fragment {
                 mMainActivity.setTitle(R.string.title_favorite);
                 break;
             default:
+                uri_path = "?";
                 break;
         }
 
-        // TODO: refactor this part to make it cleaner
-        if (uri_path.equals("favorite")){
+        if (uri_path == null) return super.onOptionsItemSelected(item);
+        if (uri_path.equals("favorite")) {
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
             mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+            mLastSortSetting = id;
             updateDisplay();
-        }else{
+
+        } else {
             Uri.Builder uriBuilder = new Uri.Builder();
             uriBuilder.scheme("http")
                     .authority("api.themoviedb.org")
@@ -170,6 +235,7 @@ public class Fragment_movieDisplay extends Fragment {
                     .appendQueryParameter("api_key", getString(R.string.apiKey));
 
             Uri uri = uriBuilder.build();
+            mLastSortSetting = id;
             loadMovies(uri);
         }
         return super.onOptionsItemSelected(item);
@@ -182,8 +248,9 @@ public class Fragment_movieDisplay extends Fragment {
     }
 
     // used OKHttp API to send URL and request movie data in JSON
-    private boolean loadMovies(Uri uri){
-        if (! MovieAppUtility.isNetworkAvailable(mContext)) {
+    private boolean loadMovies(Uri uri) {
+        if (!MovieAppUtility.isNetworkAvailable(mContext)) {
+            mCallBack.alertUserAboutError("No Network Access !");
             return false;
         }
 
@@ -198,7 +265,7 @@ public class Fragment_movieDisplay extends Fragment {
             @Override
             public void onFailure(Request request, IOException e) {
                 // main_activity.runOnUiThread();
-                mMainActivity.alertUserAboutError("HTTP request fails ...");
+                mCallBack.alertUserAboutError("HTTP request fails ...");
             }
 
             @Override
@@ -217,7 +284,10 @@ public class Fragment_movieDisplay extends Fragment {
                             }
                         });
                     } else {
-                        mMainActivity.alertUserAboutError("HTTP response has error ...");
+                        // OKHTTP might have a bug here.
+                        // this is hit everytime the search icon is clicked
+                        // BEFORE any text query submmited
+                        //mCallBack.alertUserAboutError("HTTP response has error ...");
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "IO Exception caught: ", e);
@@ -227,16 +297,16 @@ public class Fragment_movieDisplay extends Fragment {
             }
         });
         return true;
-     }
+    }
 
     // parse the JSON data and store result into MoiveInfo arrays
-    private MovieInfo[] parseMovieDetails(String jsonData) throws JSONException{
+    private MovieInfo[] parseMovieDetails(String jsonData) throws JSONException {
         JSONObject jo_root = new JSONObject(jsonData);
         JSONArray ja_results = jo_root.getJSONArray("results");
 
         MovieInfo[] movies = new MovieInfo[ja_results.length()];
 
-        for(int i =0; i< ja_results.length(); i++){
+        for (int i = 0; i < ja_results.length(); i++) {
             JSONObject jo_movie = ja_results.getJSONObject(i);
             MovieInfo movie = new MovieInfo();
 
@@ -254,23 +324,83 @@ public class Fragment_movieDisplay extends Fragment {
     }
 
     // get screen ready: set up adapter and on onClick for the GridView
-    private void updateDisplay(){
+    private void updateDisplay() {
+        // if no movies to display, hide the gridView
+        if (mMovies == null ){
+            mGridview.setVisibility(View.INVISIBLE);
+            mLabel_noMovie.setVisibility(View.VISIBLE);
+            mLabel_noMovie.setText("No Movies found in search of " + SortRId2String(mLastSortSetting));
 
-        // set up a new adapter or use the existing one
-        if (mAdapter == null) {
-            mAdapter = new ImageAdapter(mContext, mMovies);
-            mGridview.setAdapter(mAdapter);
-        }else {
-            mAdapter.setMovies(mMovies);
-        }
-
-        mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(mMainActivity, DetailActivity.class);
-                i.putExtra(MainActivity.MOVIE_INFO, mMovies[position]);
-                startActivity(i);
+            // clear other panes in tablet mode
+            if (mCallBack.isTwoPane()) {
+                mCallBack.onMovieSelected(null);
             }
-        });
+        }else {
+            mGridview.setVisibility(View.VISIBLE);
+            mLabel_noMovie.setVisibility(View.INVISIBLE);
+
+            // set up a new adapter or use the existing one
+            if (mAdapter == null) {
+                mAdapter = new ImageAdapter(mContext, mMovies);
+                mGridview.setAdapter(mAdapter);
+            } else {
+                mAdapter.setMovies(mMovies);
+            }
+
+            mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mCallBack.onMovieSelected(mMovies[position]);
+                }
+            });
+
+            // set the default to details in tablet mode
+            if (mCallBack.isTwoPane()) {
+                mCallBack.onMovieSelected(mMovies[0]);
+            }
+        }
+    }
+
+    // renew the poster display if the sort setting is favorite
+    public void renewDisplay(){
+        if (mLastSortSetting == R.id.menu_favorite){
+            Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
+            mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+            updateDisplay();
+
+            if (mMovies == null){
+                mLabel_noMovie.setText("No Local Favorite");
+                mLabel_noMovie.setVisibility(View.VISIBLE);
+            }
+        }else{
+            // additional functionality for http renew can be added here
+        }
+    }
+
+    // convert the menu option id to string
+    private String SortRId2String (int id){
+        String str = "";
+        switch (id) {
+            case R.id.setting_sort:
+                break;
+            case R.id.menu_sort_popular:
+                str = "Popular";
+                break;
+            case R.id.menu_sort_rating:
+                str = "Top Rated";
+                break;
+            case R.id.menu_sort_playing:
+                str = "Now Playing";
+                break;
+            case R.id.menu_sort_upcoming:
+                str = "Upcoming";
+                break;
+            case R.id.menu_favorite:
+                str = "Favorite";
+                break;
+            default:
+                break;
+        }
+        return str;
     }
 }

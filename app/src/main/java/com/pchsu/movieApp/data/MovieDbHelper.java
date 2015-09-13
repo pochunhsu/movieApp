@@ -24,9 +24,11 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 FavoriteEntry._ID + " INTEGER PRIMARY KEY, " +
                 FavoriteEntry.COLUMN_ID + " INTEGER UNIQUE NOT NULL, " +
                 FavoriteEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                FavoriteEntry.COLUMN_BACKDROP + " TEXT NOT NULL, " +
-                FavoriteEntry.COLUMN_POSTER + " TEXT NOT NULL, " +
-                FavoriteEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                FavoriteEntry.COLUMN_BACKDROP_URL + " TEXT NOT NULL, " +
+                FavoriteEntry.COLUMN_POSTER_URL + " TEXT NOT NULL, " +
+                FavoriteEntry.COLUMN_BACKDROP_FILE + " TEXT NOT NULL, " +
+                FavoriteEntry.COLUMN_POSTER_FILE + " TEXT NOT NULL, " +
+                FavoriteEntry.COLUMN_OVERVIEW +" TEXT NOT NULL, " +
                 FavoriteEntry.COLUMN_RELEASEDATE + " TEXT NOT NULL, " +
                 FavoriteEntry.COLUMN_VOTE + " REAL NOT NULL" +
 /*                FavoriteEntry.COLUMN_TRAILER_1 + " TEXT NOT NULL, " +

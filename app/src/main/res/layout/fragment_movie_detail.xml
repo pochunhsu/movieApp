@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/layout_movie_detail"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -70,7 +71,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:src = "@drawable/sample_poster"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="2dp"
                     android:contentDescription="@string/posterImageDescription"/>
@@ -115,8 +116,8 @@
                     android:layout_toRightOf="@+id/posterImage"/>
 
                 <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/button_heart_full"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
@@ -127,8 +128,8 @@
                     android:visibility="invisible"
                     android:clickable="true"/>
                 <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/button_heart_empty"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
@@ -138,13 +139,28 @@
                     android:background="@drawable/heart_empty"
                     android:visibility="visible"
                     android:clickable="true"/>
+
+                <ImageButton
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/button_share"
+                    android:layout_alignParentEnd="false"
+                    android:contentDescription="share button"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_share_white_48dp"
+                    android:visibility="invisible"
+                    android:clickable="true"
+                    android:layout_alignTop="@+id/button_heart_full"
+                    android:layout_toLeftOf="@+id/button_heart_full"/>
+
+
             </RelativeLayout>
 
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/overviewLabel"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
                     android:layout_below="@+id/middleSection"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"

@@ -10,6 +10,8 @@ public class MovieInfo implements Parcelable{
     private String mTitle;           // movie title
     private String mBackDropUrl;     // http path to backdrop
     private String mPosterUrl;       // http path to poster
+    private String mBackDropFile;    // file path to backdrop
+    private String mPosterFile;      // file path to poster
     private String mOverview;        // movie description
     private String mReleaseDate;     // YYYY-MM-DD
     private double mVote;            // scale: 0-10
@@ -48,6 +50,22 @@ public class MovieInfo implements Parcelable{
 
     public void setPosterUrl(String posterUrl) {
         this.mPosterUrl = posterUrl;
+    }
+
+    public String getBackDropFile() {
+        return mBackDropFile;
+    }
+
+    public void setBackDropFile(String backDropFile) {
+        mBackDropFile = backDropFile;
+    }
+
+    public String getPosterFile() {
+        return mPosterFile;
+    }
+
+    public void setPosterFile(String posterFile) {
+        mPosterFile = posterFile;
     }
 
     public String getOverview() {
@@ -109,6 +127,8 @@ public class MovieInfo implements Parcelable{
         dest.writeString(mTitle);
         dest.writeString(mBackDropUrl);
         dest.writeString(mPosterUrl);
+        dest.writeString(mBackDropFile);
+        dest.writeString(mPosterFile);
         dest.writeString(mReleaseDate);
         dest.writeDouble(mVote);
         dest.writeString(mOverview);
@@ -120,6 +140,8 @@ public class MovieInfo implements Parcelable{
         mTitle = in.readString();
         mBackDropUrl = in.readString();
         mPosterUrl = in.readString();
+        mBackDropFile = in.readString();
+        mPosterFile = in.readString();
         mReleaseDate = in.readString();
         mVote = in.readDouble();
         mOverview = in.readString();
@@ -131,6 +153,8 @@ public class MovieInfo implements Parcelable{
         mTitle = "default_title";
         mBackDropUrl = "";
         mPosterUrl = "";
+        mBackDropFile = "";
+        mPosterFile = "";
         mReleaseDate = "YYYY-MM-DD";
         mVote = 10;
         mOverview = "plot";

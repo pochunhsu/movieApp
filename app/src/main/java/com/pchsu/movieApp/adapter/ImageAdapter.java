@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.data.MovieInfo;
+import com.pchsu.movieApp.ui.MainActivity;
 import com.squareup.picasso.Picasso;
 
 public class ImageAdapter extends BaseAdapter {
@@ -23,16 +24,23 @@ public class ImageAdapter extends BaseAdapter {
         mContext = context;
         mMovies = movies;
 
+        MainActivity mainActivity = (MainActivity) context;
+
         // prepare the image size for view_holder setting and picasso resize
         // Display 2x2 in portrait mode and 3x1 in landscape mode
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        int orientation = mContext.getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mImageWidth = metrics.widthPixels / 2;
+        if (mainActivity.isTwoPane()){
+            mImageWidth = metrics.widthPixels / 9;
             mImageHeight = (int) (mImageWidth * 1.5);
-        }else{ // landscape orientation
-            mImageWidth = metrics.widthPixels / 3;
-            mImageHeight = (int) (mImageWidth * 1.5);
+        }else {
+            int orientation = mContext.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                mImageWidth = metrics.widthPixels / 2;
+                mImageHeight = (int) (mImageWidth * 1.5);
+            } else { // landscape orientation
+                mImageWidth = metrics.widthPixels / 3;
+                mImageHeight = (int) (mImageWidth * 1.5);
+            }
         }
     }
 

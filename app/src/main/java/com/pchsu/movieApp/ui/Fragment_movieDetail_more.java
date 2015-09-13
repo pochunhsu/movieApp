@@ -1,5 +1,6 @@
 package com.pchsu.movieApp.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -14,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.adapter.ReviewListAdapter;
 import com.pchsu.movieApp.data.MovieInfo;
+import com.pchsu.movieApp.utility.Communication;
 import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -40,24 +43,38 @@ public class Fragment_movieDetail_more extends ListFragment {
     public static final String TAG = Fragment_movieDetail_more.class.getSimpleName();
 
     private Context mContext;
-    private DetailActivity mActivity;
+    private Activity mActivity;
     private View mRootView;
     private Resources mResources;
     private MovieInfo mMovie;
 
+    private ReviewListAdapter mListAdapter;
+    private Communication mCallBack;
+
     private Button[] mButtonTrailer;
     @Bind(R.id.label_noData) TextView mLabel_noData;
     @Bind(R.id.button_refresh) TextView mButton_refresh;
+    @Bind(android.R.id.list) ListView mListView;
 
     public static Fragment_movieDetail_more newInstance() {
         Fragment_movieDetail_more fragment = new Fragment_movieDetail_more();
         return fragment;
     }
+
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallBack = (Communication) activity;
+        }catch(ClassCastException e){
+            throw new ClassCastException(activity.toString() + "must implement Communication!" );
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mContext = getActivity();
-        mActivity = (DetailActivity) mContext;
+        mActivity = (Activity) mContext;
 
         Intent intent = mActivity.getIntent();
         Parcelable parcelable = intent.getParcelableExtra(MainActivity.MOVIE_INFO);
@@ -83,18 +100,19 @@ public class Fragment_movieDetail_more extends ListFragment {
             public void onClick(View v) {
                 if (MovieAppUtility.isNetworkAvailable(mContext)) {
                     mButton_refresh.setVisibility(View.INVISIBLE);
-                    loadTrailerAndReview(mMovie.getId());
+                    if (mMovie != null)  loadTrailerAndReview(mMovie.getId());
                 }
             }
         });
 
         if (MovieAppUtility.isNetworkAvailable(mContext)){
             mButton_refresh.setVisibility(View.INVISIBLE);
-            loadTrailerAndReview(mMovie.getId());
+            mListView.setVisibility(View.VISIBLE);
+            if(mMovie !=null) loadTrailerAndReview(mMovie.getId());
         }else{
             mLabel_noData.setVisibility(View.VISIBLE);
             mLabel_noData.setText("No internet access");
-            //Activity.alertUserAboutError("Network is unavailable !");
+            mListView.setVisibility(View.INVISIBLE);
             mButton_refresh.setVisibility(View.VISIBLE);
         }
         return mRootView;
@@ -103,6 +121,9 @@ public class Fragment_movieDetail_more extends ListFragment {
     // used OKHttp API to send URL and request movie data in JSON
     private boolean loadTrailerAndReview(int id){
         if (! MovieAppUtility.isNetworkAvailable(mContext)) {
+            mLabel_noData.setText("No Network");
+            mLabel_noData.setVisibility(View.VISIBLE);
+            mButton_refresh.setVisibility(View.VISIBLE);
             return false;
         }
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -125,7 +146,7 @@ public class Fragment_movieDetail_more extends ListFragment {
             @Override
             public void onFailure(Request request, IOException e) {
                 // main_activity.runOnUiThread();
-                mActivity.alertUserAboutError("HTTP request fails ...");
+                mCallBack.alertUserAboutError("HTTP request fails ...");
             }
 
             @Override
@@ -144,7 +165,7 @@ public class Fragment_movieDetail_more extends ListFragment {
                             }
                         });
                     } else {
-                        mActivity.alertUserAboutError("HTTP response has error ...");
+                        mCallBack.alertUserAboutError("HTTP response has error ...");
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "IO Exception caught: ", e);
@@ -218,20 +239,45 @@ public class Fragment_movieDetail_more extends ListFragment {
         // set up ListView of reviews
         if(mMovie.getReviews() == null) {
             Log.v(TAG, " Request got no reviews!");
+            mListView.setVisibility(View.INVISIBLE);
             mLabel_noData.setVisibility(View.VISIBLE);
             mLabel_noData.setText("No reviews in the database");
-        }else{
-            mLabel_noData.setVisibility(View.INVISIBLE);
-            ReviewListAdapter adapter = new ReviewListAdapter(mContext, mMovie.getReviews());
-            setListAdapter(adapter);
-        }
 
-        // TODO: check if this is doing anything; to remove is not in use
+        }else{
+            mListView.setVisibility(View.VISIBLE);
+            mLabel_noData.setVisibility(View.INVISIBLE);
+            if (mListAdapter == null) {
+                mListAdapter = new ReviewListAdapter(mContext, mMovie.getReviews());
+                setListAdapter(mListAdapter);
+            }else{
+                mListAdapter.setListViewItems(mMovie.getReviews());
+                mListAdapter.notifyDataSetChanged();
+            }
+        }
+        mButton_refresh.setVisibility(View.INVISIBLE);
+
         // set up the shareIntent
         Intent shareIntent = createShareIntent();
         if (shareIntent!=null) {
-            mActivity.setShareIntent(shareIntent);
+            mCallBack.setShareIntent(shareIntent);
         }
+    }
+    public void updateDetailWithMovie(MovieInfo movie){
+        resetDisplay();
+        if (movie ==null) {
+            // do nothing
+        }else{
+            mMovie = movie;
+            loadTrailerAndReview(mMovie.getId());
+        }
+    }
+    // set everything invisible
+    private void resetDisplay(){
+        mButtonTrailer[0].setVisibility(View.INVISIBLE);
+        mButtonTrailer[1].setVisibility(View.INVISIBLE);
+        mListView.setVisibility(View.INVISIBLE);
+        mButton_refresh.setVisibility(View.INVISIBLE);
+        mLabel_noData.setVisibility(View.INVISIBLE);
     }
 
     private Intent createShareIntent() {
@@ -244,4 +290,5 @@ public class Fragment_movieDetail_more extends ListFragment {
         shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + mMovie.getTrailerLinks()[0]);
         return shareIntent;
     }
+
 }

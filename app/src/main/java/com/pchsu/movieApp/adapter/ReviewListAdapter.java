@@ -22,6 +22,10 @@ public class ReviewListAdapter extends BaseAdapter {
         mReviews = reviews;
     }
 
+    public void setListViewItems(Pair[] reviews){
+        mReviews = reviews;
+    }
+
     @Override
     public int getCount() {
         return mReviews.length;

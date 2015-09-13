@@ -68,12 +68,11 @@ public class MovieAppUtility {
         File imgFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
         imgFile.delete();
     }
-
     //
     // load data from the cursor and store the data as the format of movie array
     //
     public static MovieInfo[] convertCursorToMovies (Cursor cursor){
-        if (cursor == null) return null;
+        if (cursor.getCount() ==0) return null;
         MovieInfo[] movies = new MovieInfo[cursor.getCount()];
         for(int j = 0; j< cursor.getCount(); j++){
             movies[j]= new MovieInfo();
@@ -86,14 +85,17 @@ public class MovieAppUtility {
         while(cursor.moveToNext()){
             movies[i].setId(cursor.getInt(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_ID)));
             movies[i].setTitle(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_TITLE)));
-            movies[i].setBackDropUrl(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_BACKDROP)));
-            movies[i].setPosterUrl(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_POSTER)));
+            movies[i].setBackDropUrl(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_BACKDROP_URL)));
+            movies[i].setPosterUrl(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_POSTER_URL)));
+            movies[i].setBackDropFile(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_BACKDROP_FILE)));
+            movies[i].setPosterFile(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_POSTER_FILE)));
             movies[i].setOverview(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_OVERVIEW)));
             movies[i].setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_RELEASEDATE)));
             movies[i].setVote(cursor.getInt(cursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_VOTE)));
             i++;
         }
         Log.d(TAG, i + " favorites found !");
+        cursor.close();
         return movies;
     }
 
