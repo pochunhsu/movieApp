@@ -49,6 +49,7 @@ public class Fragment_movieDetail extends Fragment{
 
     private Boolean mOnCreatedViewCalled =false;
     private Boolean mOriginalFavoriteState = false;
+    private Boolean mFinalFavoriteSate = false;
 
     private SharedPreferences mChangeInFavorite;
 
@@ -162,8 +163,7 @@ public class Fragment_movieDetail extends Fragment{
             return;
         }
 
-        Boolean FinalFavoriteSate = (mButtonHeartEmpty.getVisibility() == View.VISIBLE);
-        Boolean stateChange = (mOriginalFavoriteState != FinalFavoriteSate);
+        Boolean stateChange = (mOriginalFavoriteState != mFinalFavoriteSate);
 
         if (stateChange){
             if (mButtonHeartFull.getVisibility() == View.VISIBLE){
@@ -254,6 +254,7 @@ public class Fragment_movieDetail extends Fragment{
                     Toast.makeText(mContext, mMovie.getTitle() + " added to favorite", Toast.LENGTH_SHORT).show();
                     // delay the real store/delete to onPause
                     mChangeInFavorite.edit().putInt("id", mMovie.getId()).apply();
+                    mFinalFavoriteSate = true;
                 }
             }
         });
@@ -275,6 +276,7 @@ public class Fragment_movieDetail extends Fragment{
                 }else{
                     // delay the real store/delete to onPause
                     mChangeInFavorite.edit().putInt("id", mMovie.getId()).apply();
+                    mFinalFavoriteSate = false;
                 }
             }
         });
