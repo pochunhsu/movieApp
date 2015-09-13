@@ -1,4 +1,3 @@
-
 <resources>
     <!-- themoviedb api key-->
 <string name="apiKey"></string>
