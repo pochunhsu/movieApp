@@ -51,6 +51,8 @@ public class Fragment_movieDetail_more extends ListFragment {
     private ReviewListAdapter mListAdapter;
     private Communication mCallBack;
 
+    private boolean mOnCreatedViewCalled = false;
+
     private Button[] mButtonTrailer;
     @Bind(R.id.label_noData) TextView mLabel_noData;
     @Bind(R.id.button_refresh) TextView mButton_refresh;
@@ -76,10 +78,6 @@ public class Fragment_movieDetail_more extends ListFragment {
         mContext = getActivity();
         mActivity = (Activity) mContext;
 
-        Intent intent = mActivity.getIntent();
-        Parcelable parcelable = intent.getParcelableExtra(MainActivity.MOVIE_INFO);
-        mMovie = (MovieInfo) parcelable;
-
         // program the sections' height based on the screen size and the weight integer specified in xml
         mResources = getResources();
         DisplayMetrics metrics = mResources.getDisplayMetrics();
@@ -94,6 +92,7 @@ public class Fragment_movieDetail_more extends ListFragment {
         mButtonTrailer[0] = (Button) mRootView.findViewById(R.id.button_trailer1);
         mButtonTrailer[1] = (Button) mRootView.findViewById(R.id.button_trailer2);
 
+        // set up refresh button
         mButton_refresh = (Button) mRootView.findViewById(R.id.button_refresh);
         mButton_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,19 +104,33 @@ public class Fragment_movieDetail_more extends ListFragment {
             }
         });
 
-        if (MovieAppUtility.isNetworkAvailable(mContext)){
-            mButton_refresh.setVisibility(View.INVISIBLE);
-            mListView.setVisibility(View.VISIBLE);
-            if(mMovie !=null) loadTrailerAndReview(mMovie.getId());
-        }else{
-            mLabel_noData.setVisibility(View.VISIBLE);
-            mLabel_noData.setText("No internet access");
-            mListView.setVisibility(View.INVISIBLE);
-            mButton_refresh.setVisibility(View.VISIBLE);
-        }
+        mOnCreatedViewCalled = true;
         return mRootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (! mCallBack.isTwoPane()){
+            Intent intent = mActivity.getIntent();
+            Parcelable parcelable = intent.getParcelableExtra(MainActivity.MOVIE_INFO);
+            mMovie = (MovieInfo) parcelable;
+        }else{
+            mMovie = mCallBack.requestDefaultMovie();
+        }
+
+        if (MovieAppUtility.isNetworkAvailable(mContext)){
+            mButton_refresh.setVisibility(View.INVISIBLE);
+            mLabel_noData.setVisibility(View.INVISIBLE);
+            mListView.setVisibility(View.VISIBLE);
+            if(mMovie !=null) loadTrailerAndReview(mMovie.getId());
+        }else{
+            mButton_refresh.setVisibility(View.VISIBLE);
+            mLabel_noData.setVisibility(View.VISIBLE);
+            mLabel_noData.setText("No internet access");
+            mListView.setVisibility(View.INVISIBLE);
+        }
+    }
     // used OKHttp API to send URL and request movie data in JSON
     private boolean loadTrailerAndReview(int id){
         if (! MovieAppUtility.isNetworkAvailable(mContext)) {
@@ -262,7 +275,12 @@ public class Fragment_movieDetail_more extends ListFragment {
             mCallBack.setShareIntent(shareIntent);
         }
     }
+
     public void updateDetailWithMovie(MovieInfo movie){
+        // public method accessible to the other classes needs this check
+        // to avoid access states that aren't ready yet
+        if (mOnCreatedViewCalled != true) return;
+
         resetDisplay();
         if (movie ==null) {
             // do nothing

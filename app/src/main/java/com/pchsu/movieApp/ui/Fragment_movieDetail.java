@@ -43,6 +43,7 @@ public class Fragment_movieDetail extends Fragment{
     private Resources mResources;
     private ContentResolver mResolver;
     private MovieInfo mMovie;
+    private Boolean mOnCreatedViewCalled =false;
 
     // call back interface
     private Communication mCallBack;
@@ -102,6 +103,8 @@ public class Fragment_movieDetail extends Fragment{
         mTopSec.getLayoutParams().height = topSecHeight;
         mMiddleSec.getLayoutParams().height = middleSecHeight;
 
+        mOnCreatedViewCalled = true;
+
         return rootView;
     }
 
@@ -119,6 +122,8 @@ public class Fragment_movieDetail extends Fragment{
             updateDetail();
 
         }else{
+            mMovie = mCallBack.requestDefaultMovie();
+            updateDetail();
             mButtonShare.setVisibility(View.VISIBLE);
         }
     }
@@ -128,6 +133,8 @@ public class Fragment_movieDetail extends Fragment{
     // This must be called AFTER all findViewById (ButterKnife.bind) is done
     //
     private void updateDetail(){
+        if (mOnCreatedViewCalled != true || mMovie == null) return;
+
         // load content into each elements
         mTitleLabel.setText(mMovie.getTitle());
         mFullTitleLabel.setText(mMovie.getTitle());
@@ -242,6 +249,13 @@ public class Fragment_movieDetail extends Fragment{
     }
 
     public void updateDetailWithMovie(MovieInfo movie){
+        // public method accessible to the other classes needs this check
+        // to avoid access states that aren't ready yet
+        if (mOnCreatedViewCalled != true) return;
+        if (mLayout == null){
+            Log.e(TAG, "mLayout is null and accessed in updateDetailWithMovie");
+            return;
+        }
         if (movie ==null) {
             mLayout.setVisibility(View.INVISIBLE);
         }else{

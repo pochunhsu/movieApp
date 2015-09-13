@@ -92,7 +92,8 @@ public class DetailActivity extends AppCompatActivity
         dialog.show(getFragmentManager(), AlertDialogFragment.ERR_MSG_TAG);
     }
 
-    // no use ; empty interface
+    // no use ; empty interface ; these are only used in tablet mode
     public void onMovieSelected (MovieInfo movie){}
     public void renewPosterDisplay(){}
+    public MovieInfo requestDefaultMovie(){return null;}
 }

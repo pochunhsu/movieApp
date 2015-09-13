@@ -10,4 +10,5 @@ public interface Communication {
     void onMovieSelected(MovieInfo movie);
     void setShareIntent(Intent shareIntent);
     void renewPosterDisplay();
+    MovieInfo requestDefaultMovie();
 }

@@ -54,7 +54,7 @@ public class Fragment_movieDisplay extends Fragment {
 
     private int mLastSortSetting;
 
-    private boolean mIsActivityCreated;
+    private boolean mOnCreatedViewCalled = false;
     // callback interface
     private Communication mCallBack;
 
@@ -77,7 +77,6 @@ public class Fragment_movieDisplay extends Fragment {
         mContext = getActivity();
         mMainActivity = (MainActivity) mContext;
         mResolver = mContext.getContentResolver();
-        mIsActivityCreated = false;
 
         // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
@@ -101,14 +100,14 @@ public class Fragment_movieDisplay extends Fragment {
             mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray(TAG_MOVIE_DATA);
             updateDisplay();
         }
-
+        mOnCreatedViewCalled = true;
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mIsActivityCreated = true;
+
         // loadMovies.updateDisplay needs to check pane layout setting
         // so have it delayed to this time point
         if (savedInstanceState == null) {
@@ -325,6 +324,8 @@ public class Fragment_movieDisplay extends Fragment {
 
     // get screen ready: set up adapter and on onClick for the GridView
     private void updateDisplay() {
+        if (mOnCreatedViewCalled != true) return;
+
         // if no movies to display, hide the gridView
         if (mMovies == null ){
             mGridview.setVisibility(View.INVISIBLE);
@@ -363,6 +364,10 @@ public class Fragment_movieDisplay extends Fragment {
 
     // renew the poster display if the sort setting is favorite
     public void renewDisplay(){
+        // public method accessible to the other classes needs this check
+        // to avoid access states that aren't ready yet
+        if (mOnCreatedViewCalled != true) return;
+
         if (mLastSortSetting == R.id.menu_favorite){
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
             mMovies = MovieAppUtility.convertCursorToMovies(cursor);
@@ -374,6 +379,14 @@ public class Fragment_movieDisplay extends Fragment {
             }
         }else{
             // additional functionality for http renew can be added here
+        }
+    }
+
+    public MovieInfo getDefaultMovie(){
+        if (mMovies != null){
+            return mMovies[0];
+        }else{
+            return null;
         }
     }
 

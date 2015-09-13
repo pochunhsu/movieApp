@@ -93,4 +93,16 @@ public class MainActivity extends AppCompatActivity
             fragment_posters.renewDisplay();
         }
     }
+
+    // tablet mode: fragment can use this interface to request default movie to show
+    public MovieInfo requestDefaultMovie(){
+        if (isTwoPane()) {
+            Fragment_movieDisplay fragment_posters = (Fragment_movieDisplay)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_movieDisplay);
+            return fragment_posters.getDefaultMovie();
+        }else{
+            Log.e(TAG, "phone app shouldn't need to call this; they use intent");
+            return null;
+        }
+    }
 }
