@@ -79,10 +79,15 @@ public class MainActivity extends AppCompatActivity
 
     // tablet mode: pass the intent to set up Share button OnClick in Detail Fragment
     public void setShareIntent(Intent shareIntent){
-        if (shareIntent == null) return;
+        if (shareIntent == null || !isTwoPane()) return;
+
         Fragment_movieDetail fragment_detail = (Fragment_movieDetail)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_movieDetail);
-        fragment_detail.setShareButtonListener(shareIntent);
+        if (fragment_detail == null){
+            Log.e(TAG, " null detail fragment !");
+        }else {
+            fragment_detail.setShareButtonListener(shareIntent);
+        }
     }
 
     // tablet mode: use to update the poster display in real time
@@ -90,7 +95,11 @@ public class MainActivity extends AppCompatActivity
         if (isTwoPane()) {
             Fragment_movieDisplay fragment_posters = (Fragment_movieDisplay)
                     getSupportFragmentManager().findFragmentById(R.id.fragment_movieDisplay);
-            fragment_posters.renewDisplay();
+            if (fragment_posters == null){
+                Log.e(TAG, " null poster fragment !");
+            }else {
+                fragment_posters.renewDisplay();
+            }
         }
     }
 
@@ -99,7 +108,12 @@ public class MainActivity extends AppCompatActivity
         if (isTwoPane()) {
             Fragment_movieDisplay fragment_posters = (Fragment_movieDisplay)
                     getSupportFragmentManager().findFragmentById(R.id.fragment_movieDisplay);
-            return fragment_posters.getDefaultMovie();
+            if (fragment_posters == null){
+                Log.e(TAG, " null poster fragment !");
+                return null;
+            }else {
+                return fragment_posters.getDefaultMovie();
+            }
         }else{
             Log.e(TAG, "phone app shouldn't need to call this; they use intent");
             return null;

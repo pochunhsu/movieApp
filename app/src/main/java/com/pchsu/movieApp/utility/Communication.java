@@ -12,3 +12,4 @@ public interface Communication {
     void renewPosterDisplay();
     MovieInfo requestDefaultMovie();
 }
+

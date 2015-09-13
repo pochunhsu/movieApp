@@ -3,6 +3,7 @@ package com.pchsu.movieApp.ui;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.pchsu.movieApp.data.MovieContract;
 import com.pchsu.movieApp.data.MovieInfo;
 import com.pchsu.movieApp.utility.Communication;
 import com.pchsu.movieApp.utility.MovieAppUtility;
+import com.pchsu.movieApp.utility.GlobalConstant;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -53,7 +55,7 @@ public class Fragment_movieDisplay extends Fragment {
     private ImageAdapter mAdapter;
 
     private int mLastSortSetting;
-
+    private SharedPreferences mChangeInFavorite;
     private boolean mOnCreatedViewCalled = false;
     // callback interface
     private Communication mCallBack;
@@ -77,6 +79,7 @@ public class Fragment_movieDisplay extends Fragment {
         mContext = getActivity();
         mMainActivity = (MainActivity) mContext;
         mResolver = mContext.getContentResolver();
+        mChangeInFavorite = mContext.getSharedPreferences(GlobalConstant.SharedPreference_favorite, 0);
 
         // setting to enable onCreateOptionMenu callback
         setHasOptionsMenu(true);
@@ -121,6 +124,19 @@ public class Fragment_movieDisplay extends Fragment {
                 Uri uri = uriBuilder.build();
                 loadMovies(uri);
                 mLastSortSetting = R.id.menu_sort_popular;
+
+            }else{
+                // load the favorite when no network
+                Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
+                mMovies = MovieAppUtility.convertCursorToMovies(cursor);
+                updateDisplay();
+
+                if (mMovies == null){
+                    mLabel_noMovie.setText("No Network and No Local Favorite");
+                    mLabel_noMovie.setVisibility(View.VISIBLE);
+                }else{
+                    mMainActivity.setTitle(R.string.title_favorite);
+                }
             }
         }
     }
@@ -129,19 +145,23 @@ public class Fragment_movieDisplay extends Fragment {
     public void onResume() {
         // force refresh in favorite mode in case a movie gets removed from favorite
         super.onResume();
-        if (mLastSortSetting == R.id.menu_favorite ||
-            ! MovieAppUtility.isNetworkAvailable(mContext)) {
+
+        // check if favorite set has been changed
+        // this only has effect on phone layout (communication across activity boundary)
+        // tablet uses interface for inter-fragment communication
+        boolean change = (mChangeInFavorite.getInt("id", 0) != 0);
+        mChangeInFavorite.edit().remove("id").apply();
+
+        if (mLastSortSetting == R.id.menu_favorite && change) {
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null, null, null, null);
             mMovies = MovieAppUtility.convertCursorToMovies(cursor);
             updateDisplay();
 
             if (mMovies == null){
-                String str = "";
-                if (! MovieAppUtility.isNetworkAvailable(mContext)) {
-                    str = "No Network and ";
-                }
-                mLabel_noMovie.setText(str + "No Local Favorite");
+                mLabel_noMovie.setText("No Local Favorite");
                 mLabel_noMovie.setVisibility(View.VISIBLE);
+            }else{
+                mMainActivity.setTitle(R.string.title_popular);
             }
         }
     }

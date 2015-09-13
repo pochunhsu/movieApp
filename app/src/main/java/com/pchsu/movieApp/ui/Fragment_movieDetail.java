@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -24,9 +25,11 @@ import android.widget.Toast;
 
 import com.pchsu.movieApp.R;
 import com.pchsu.movieApp.data.FavoriteMovieProvider;
+import com.pchsu.movieApp.data.MovieContract;
 import com.pchsu.movieApp.data.MovieContract.FavoriteEntry;
 import com.pchsu.movieApp.data.MovieInfo;
 import com.pchsu.movieApp.utility.Communication;
+import com.pchsu.movieApp.utility.GlobalConstant;
 import com.pchsu.movieApp.utility.MovieAppUtility;
 import com.squareup.picasso.Picasso;
 
@@ -43,7 +46,11 @@ public class Fragment_movieDetail extends Fragment{
     private Resources mResources;
     private ContentResolver mResolver;
     private MovieInfo mMovie;
+
     private Boolean mOnCreatedViewCalled =false;
+    private Boolean mOriginalFavoriteState = false;
+
+    private SharedPreferences mChangeInFavorite;
 
     // call back interface
     private Communication mCallBack;
@@ -80,15 +87,15 @@ public class Fragment_movieDetail extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getActivity();
+        mActivity = (Activity) mContext;
+        mResolver = mContext.getContentResolver();
+        mChangeInFavorite = mContext.getSharedPreferences(GlobalConstant.SharedPreference_favorite, 0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mContext = getActivity();
-        mActivity = (Activity) mContext;
-        mResolver = mContext.getContentResolver();
-
         // program the sections' height based on the screen size and the weight integer specified in xml
         mResources = getResources();
         DisplayMetrics metrics = mResources.getDisplayMetrics();
@@ -125,6 +132,51 @@ public class Fragment_movieDetail extends Fragment{
             mMovie = mCallBack.requestDefaultMovie();
             updateDetail();
             mButtonShare.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // tablet mode doesn't need this and should avoid it
+        // in tablet mode fragment start; the mMoive probably is be ready yet
+        if (mCallBack.isTwoPane()) return;
+
+        Cursor cursor = mResolver.query(FavoriteEntry.CONTENT_URI,
+                null,
+                FavoriteEntry.COLUMN_ID + "=?",
+                new String[]{mMovie.getId() + ""},
+                null);
+        mOriginalFavoriteState = (cursor.getCount()!= 0);
+        cursor.close();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // this should only happens in Phone mode;
+        // table mode uses callback interface for real-time update
+        if (mCallBack.isTwoPane()) {
+            return;
+        }
+
+        Boolean FinalFavoriteSate = (mButtonHeartEmpty.getVisibility() == View.VISIBLE);
+        Boolean stateChange = (mOriginalFavoriteState != FinalFavoriteSate);
+
+        if (stateChange){
+            if (mButtonHeartFull.getVisibility() == View.VISIBLE){
+                if (MovieAppUtility.isNetworkAvailable(mContext)) {
+                    storeFavoriteData();
+                }else{ // abort the favorite add
+                    Toast.makeText(mContext,"No network to add favorite", Toast.LENGTH_SHORT).show();
+                    mButtonHeartFull.setVisibility(View.INVISIBLE);
+                    mButtonHeartEmpty.setVisibility(View.VISIBLE);
+                }
+            }else{
+                removeFavoriteData();
+            }
         }
     }
 
@@ -185,37 +237,23 @@ public class Fragment_movieDetail extends Fragment{
             @Override
             public void onClick(View v) {
 
-                // store poster and backdrop image into external storage
-                if ( ! MovieAppUtility.isExternalStorageWritable()){
-                    mCallBack.alertUserAboutError("No access to external storage for storing poster image!");
-                }else if ( ! MovieAppUtility.isNetworkAvailable(mContext)){
-                    mCallBack.alertUserAboutError("No access to internet for downloading images!");
+                if (mCallBack.isTwoPane()) {
+                    if (storeFavoriteData()){
+                        // update UI
+                        mButtonHeartEmpty.setVisibility(View.INVISIBLE);
+                        mButtonHeartFull.setVisibility(View.VISIBLE);
+                        Toast.makeText(mContext, mMovie.getTitle() + " added to favorite", Toast.LENGTH_SHORT).show();
+                    }
+                    // update the poster display in real time
+                    // the order matters: update the db before the renew
+                    mCallBack.renewPosterDisplay();
                 }else{
-                    //String imageUrl = mContext.getString(R.string.imageUrlPath) + mMovie.getPosterUrl();
-                    File f_poster = MovieAppUtility.downloadImageFile(mContext, mMovie.getPosterUrl(), mMovie.getId() + "-p.jpg");
-                    File f_backdrop = MovieAppUtility.downloadImageFile(mContext, mMovie.getBackDropUrl(), mMovie.getId() + "-b.jpg");
-
-                    mMovie.setBackDropFile(f_backdrop.toString());
-                    mMovie.setPosterFile(f_poster.toString());
-                    // use resolver to store data into content provider
-                    ContentValues values = new ContentValues();
-                    values.put(FavoriteEntry.COLUMN_ID, mMovie.getId());
-                    values.put(FavoriteEntry.COLUMN_TITLE, mMovie.getTitle());
-                    values.put(FavoriteEntry.COLUMN_BACKDROP_URL, mMovie.getBackDropUrl());
-                    values.put(FavoriteEntry.COLUMN_POSTER_URL, mMovie.getPosterUrl());
-                    values.put(FavoriteEntry.COLUMN_BACKDROP_FILE, mMovie.getBackDropFile());
-                    values.put(FavoriteEntry.COLUMN_POSTER_FILE, mMovie.getPosterFile());
-                    values.put(FavoriteEntry.COLUMN_OVERVIEW, mMovie.getOverview());
-                    values.put(FavoriteEntry.COLUMN_RELEASEDATE, mMovie.getReleaseDate());
-                    values.put(FavoriteEntry.COLUMN_VOTE, mMovie.getVote());
-
-                    mResolver.insert(FavoriteEntry.CONTENT_URI, values);
-
-                    // toggle the image button
+                    // update UI
                     mButtonHeartEmpty.setVisibility(View.INVISIBLE);
                     mButtonHeartFull.setVisibility(View.VISIBLE);
-                    Toast.makeText(mContext, mMovie.getTitle() + " added to favorite", Toast.LENGTH_SHORT);
-                    mCallBack.renewPosterDisplay();
+                    Toast.makeText(mContext, mMovie.getTitle() + " added to favorite", Toast.LENGTH_SHORT).show();
+                    // delay the real store/delete to onPause
+                    mChangeInFavorite.edit().putInt("id", mMovie.getId()).apply();
                 }
             }
         });
@@ -224,28 +262,85 @@ public class Fragment_movieDetail extends Fragment{
         mButtonHeartFull.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int deleteCnt = mResolver.delete (FavoriteEntry.CONTENT_URI,
-                        FavoriteEntry.COLUMN_ID + " = ? ", new String[]{mMovie.getId() + ""});
-
-                // verify result
-                if (deleteCnt == 0){
-                    String msg = "Warning: No instance to delete: " + mMovie.getId() + " " + mMovie.getTitle();
-                    Log.w(FavoriteMovieProvider.TAG, msg);
-                }
-
                 // update UI
                 mButtonHeartFull.setVisibility(View.INVISIBLE);
                 mButtonHeartEmpty.setVisibility(View.VISIBLE);
-                Toast.makeText(mContext, mMovie.getTitle() + " removed from favorite", Toast.LENGTH_SHORT);
+                Toast.makeText(mContext, mMovie.getTitle() + " removed from favorite", Toast.LENGTH_SHORT).show();
 
-                // remove images from the storage
-                if (MovieAppUtility.isExternalStorageWritable()){
-                    MovieAppUtility.deleteImageFile(mContext,mMovie.getId()+"-p.jpg");
-                    MovieAppUtility.deleteImageFile(mContext, mMovie.getId() + "-b.jpg");
+                if (mCallBack.isTwoPane()) {
+                    // update the poster display in real time
+                    // the order matters: update the db before the renew
+                    removeFavoriteData();
+                    mCallBack.renewPosterDisplay();
+                }else{
+                    // delay the real store/delete to onPause
+                    mChangeInFavorite.edit().putInt("id", mMovie.getId()).apply();
                 }
-                mCallBack.renewPosterDisplay();
             }
         });
+    }
+
+    // store the movie into content provider and storage
+    // return true on success
+    private boolean storeFavoriteData(){
+        if ( ! MovieAppUtility.isExternalStorageWritable()){
+            mCallBack.alertUserAboutError("No access to external storage for storing poster image!");
+            return false;
+        }else if ( ! MovieAppUtility.isNetworkAvailable(mContext)){
+            mCallBack.alertUserAboutError("No access to internet for downloading images!");
+            return false;
+        }else{
+            // query the movie to see if it already exists ; Skip the insert if the record exists
+            // duplicate inserts get error
+            String[] Args = new String[]{Integer.toString(mMovie.getId())};
+            Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null,
+                                            FavoriteEntry.COLUMN_ID + "=?",
+                                            Args, null);
+            if (cursor.getCount() != 0) {
+                cursor.close();
+                return true;
+            }
+
+            // store poster and backdrop image into external storage
+            File f_poster = MovieAppUtility.downloadImageFile(mContext, mMovie.getPosterUrl(), mMovie.getId() + "-p.jpg");
+            File f_backdrop = MovieAppUtility.downloadImageFile(mContext, mMovie.getBackDropUrl(), mMovie.getId() + "-b.jpg");
+            mMovie.setBackDropFile(f_backdrop.toString());
+            mMovie.setPosterFile(f_poster.toString());
+
+            // use resolver to store data into content provider
+            ContentValues values = new ContentValues();
+            values.put(FavoriteEntry.COLUMN_ID, mMovie.getId());
+            values.put(FavoriteEntry.COLUMN_TITLE, mMovie.getTitle());
+            values.put(FavoriteEntry.COLUMN_BACKDROP_URL, mMovie.getBackDropUrl());
+            values.put(FavoriteEntry.COLUMN_POSTER_URL, mMovie.getPosterUrl());
+            values.put(FavoriteEntry.COLUMN_BACKDROP_FILE, mMovie.getBackDropFile());
+            values.put(FavoriteEntry.COLUMN_POSTER_FILE, mMovie.getPosterFile());
+            values.put(FavoriteEntry.COLUMN_OVERVIEW, mMovie.getOverview());
+            values.put(FavoriteEntry.COLUMN_RELEASEDATE, mMovie.getReleaseDate());
+            values.put(FavoriteEntry.COLUMN_VOTE, mMovie.getVote());
+
+            mResolver.insert(FavoriteEntry.CONTENT_URI, values);
+            return true;
+        }
+    }
+
+    private void removeFavoriteData(){
+
+        // access content provider to delete the record
+        int deleteCnt = mResolver.delete (FavoriteEntry.CONTENT_URI,
+                FavoriteEntry.COLUMN_ID + " = ? ", new String[]{mMovie.getId() + ""});
+        // verify result
+        if (deleteCnt == 0){
+            String msg = "Warning: No instance to delete: " + mMovie.getId() + " " + mMovie.getTitle();
+            Log.w(FavoriteMovieProvider.TAG, msg);
+        }
+        // remove images from the storage
+        if (MovieAppUtility.isExternalStorageWritable()){
+            MovieAppUtility.deleteImageFile(mContext,mMovie.getId()+"-p.jpg");
+            MovieAppUtility.deleteImageFile(mContext, mMovie.getId() + "-b.jpg");
+        }else{
+            Log.w(FavoriteMovieProvider.TAG, "No access to external storage");
+        }
     }
 
     public void updateDetailWithMovie(MovieInfo movie){
