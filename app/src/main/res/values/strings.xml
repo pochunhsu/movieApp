@@ -26,7 +26,4 @@
     <string name="posterImageDescription">poster image</string>
     <string name="title_background_description">Title background image</string>
 
-    <!-- themoviedb api key-->
-    <string name="apiKey"></string>
-
 </resources>
