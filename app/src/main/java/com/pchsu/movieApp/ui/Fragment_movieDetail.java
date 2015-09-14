@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -100,8 +101,10 @@ public class Fragment_movieDetail extends Fragment{
         // program the sections' height based on the screen size and the weight integer specified in xml
         mResources = getResources();
         DisplayMetrics metrics = mResources.getDisplayMetrics();
+
         int topSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.topSecWeight) / 100;
         int middleSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.middleSecWeight) / 100;
+
 
         // inflate the view and instantiate all elements
         final View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -119,6 +122,12 @@ public class Fragment_movieDetail extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        int orientation = mContext.getResources().getConfiguration().orientation;
+
+        // adjust the height of backdrop picture for large screen portrait mode
+        if (mCallBack.isTwoPane() && orientation == Configuration.ORIENTATION_PORTRAIT){
+            mTopSec.getLayoutParams().height = mTopSec.getLayoutParams().height/2;
+        }
 
         // delay the screen update until now,
         // because this point promises pane layout check in Activity OnCreate is done

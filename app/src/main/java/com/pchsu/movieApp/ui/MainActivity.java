@@ -1,7 +1,6 @@
 package com.pchsu.movieApp.ui;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +27,6 @@ public class MainActivity extends AppCompatActivity
         // 2-pane table mode
         if (fragment != null) {
             mTwoPane = true;
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.main_container, new Fragment_movieDisplay())

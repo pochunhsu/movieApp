@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context=".MainActivityFragment">
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gridDisplay"
+        android:layout_gravity="center"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:numColumns="4"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/label_noMovie"
+        android:textSize="25sp"
+        android:textColor="@android:color/white"
+        android:textIsSelectable="false"
+        android:gravity="center_horizontal"
+        tools:text = "No movies found as ..."
+        android:visibility="invisible"/>
+</FrameLayout>

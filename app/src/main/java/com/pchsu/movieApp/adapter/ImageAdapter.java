@@ -27,12 +27,20 @@ public class ImageAdapter extends BaseAdapter {
         MainActivity mainActivity = (MainActivity) context;
 
         // prepare the image size for view_holder setting and picasso resize
-        // Display 2x2 in portrait mode and 3x1 in landscape mode
+
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
         if (mainActivity.isTwoPane()){
-            mImageWidth = metrics.widthPixels / 9;
-            mImageHeight = (int) (mImageWidth * 1.5);
+            // Display 4x2 in portrait mode and 3x3 in landscape mode
+            int orientation = mContext.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                mImageWidth = metrics.widthPixels / 4;
+                mImageHeight = (int) (mImageWidth * 1.5);
+            }else {
+                mImageWidth = metrics.widthPixels / 9;
+                mImageHeight = (int) (mImageWidth * 1.5);
+            }
         }else {
+            // Display 2x2 in portrait mode and 3x1 in landscape mode
             int orientation = mContext.getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                 mImageWidth = metrics.widthPixels / 2;

@@ -45,7 +45,8 @@ import butterknife.ButterKnife;
 public class Fragment_movieDisplay extends Fragment {
 
     public static final String TAG = Fragment_movieDisplay.class.getSimpleName();
-    public static final String TAG_MOVIE_DATA = "MovieData";
+    private static final String TAG_MOVIE_DATA = "MovieData";
+    private static final String TAG_SETTING_DATA = "SettingData";
 
     private Context mContext;
     private MainActivity mMainActivity;
@@ -93,18 +94,6 @@ public class Fragment_movieDisplay extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_poster, container, false);
         ButterKnife.bind(this, rootView);
-
-        // load the movieInfo array from the stored data
-        // if data exists in saveInstanceState, no reload is required (after screen rotation)
-        if (savedInstanceState == null) {
-            // do nothing
-            // postpone the work to onActivityCreated
-            // because work need to be serialized with inTwoPane in Activity.OnCreate
-        } else {
-            // regain the movie data from the saved state
-            mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray(TAG_MOVIE_DATA);
-            updateDisplay();
-        }
         mOnCreatedViewCalled = true;
         return rootView;
     }
@@ -138,6 +127,10 @@ public class Fragment_movieDisplay extends Fragment {
                     mLabel_noMovie.setVisibility(View.VISIBLE);
                 }
             }
+        }else{
+            mMovies = (MovieInfo[]) savedInstanceState.getParcelableArray(TAG_MOVIE_DATA);
+            mLastSortSetting = savedInstanceState.getInt(TAG_SETTING_DATA, R.id.menu_sort_popular);
+            updateDisplay();
         }
     }
 
@@ -257,6 +250,7 @@ public class Fragment_movieDisplay extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArray(TAG_MOVIE_DATA, mMovies);
+        outState.putInt(TAG_SETTING_DATA, mLastSortSetting);
         super.onSaveInstanceState(outState);
     }
 
@@ -338,7 +332,6 @@ public class Fragment_movieDisplay extends Fragment {
     // get screen ready: set up adapter and on onClick for the GridView
     private void updateDisplay() {
         if (mOnCreatedViewCalled != true) return;
-
         updateTitle();
 
         // if no movies to display, hide the gridView

@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:baselineAligned="false"
+              android:divider="?android:attr/dividerHorizontal"
+              android:orientation="vertical"
+              tools:context="com.example.android.sunshine.app.MainActivity">
+
+    <!--
+    This layout is a two-pane layout for the Items master/detail flow.
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="50"
+        android:orientation="horizontal">
+        <fragment
+            android:id="@+id/fragment_movieDetail"
+            android:name="com.pchsu.movieApp.ui.Fragment_movieDetail"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50">
+        </fragment>
+        <fragment
+            android:id="@+id/fragment_movieDetail_more"
+            android:name="com.pchsu.movieApp.ui.Fragment_movieDetail_more"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50">
+        </fragment>
+    </LinearLayout>
+    <fragment
+        android:id="@+id/fragment_movieDisplay"
+        android:name="com.pchsu.movieApp.ui.Fragment_movieDisplay"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="50">
+    </fragment>
+</LinearLayout>
