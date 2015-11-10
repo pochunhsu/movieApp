@@ -29,6 +29,7 @@ public class ImageAdapter extends BaseAdapter {
         // prepare the image size for view_holder setting and picasso resize
 
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        // tablet display configuration
         if (mainActivity.isTwoPane()){
             // Display 4x2 in portrait mode and 3x3 in landscape mode
             int orientation = mContext.getResources().getConfiguration().orientation;
@@ -39,6 +40,7 @@ public class ImageAdapter extends BaseAdapter {
                 mImageWidth = metrics.widthPixels / 9;
                 mImageHeight = (int) (mImageWidth * 1.5);
             }
+        // phone display configuration
         }else {
             // Display 2x2 in portrait mode and 3x1 in landscape mode
             int orientation = mContext.getResources().getConfiguration().orientation;

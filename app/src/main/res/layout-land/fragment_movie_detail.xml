@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/layout_movie_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="50"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/detail_gradient">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="50"
+            android:background="@drawable/title_image_gradient"
+            android:id="@+id/backdrop">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/titleImage"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/title_background_description"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/titleImageGradient"
+                    android:layout_gravity="center"/>
+                <!--  background gradient could be used for display text -->
+                <!--  android:background = "@drawable/title_image_gradient" -->
+
+            </FrameLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/titleLabel"
+                android:textSize="40sp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                tools:text = "Title"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="50"
+            android:id="@+id/poster">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:id="@+id/posterImage"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src = "@drawable/sample_poster"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="2dp"
+                android:contentDescription="@string/posterImageDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/fullTitleLabel"
+                android:textSize="25sp"
+                tools:text = "movie title ..."
+                android:layout_margin="5dp"
+                android:gravity="left"
+                android:layout_toRightOf="@+id/posterImage"/>
+
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingBar"
+                android:layout_below="@+id/fullTitleLabel"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_margin="5dp"
+                android:layout_toRightOf="@+id/posterImage"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingLabel"
+                android:layout_toRightOf="@+id/ratingBar"
+                android:layout_below="@+id/fullTitleLabel"
+                android:layout_margin="5dp"
+                android:textSize="15sp"
+                tools:text = "3.5 / 5.0"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/releaseDateLabel"
+                android:layout_below="@+id/ratingBar"
+                android:textSize="20sp"
+                tools:text = "2015-05-23"
+                android:layout_margin="5dp"
+                android:layout_toRightOf="@+id/posterImage"/>
+
+            <ImageButton
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/button_heart_full"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="heart full; click to unfavorite"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/heart_full"
+                android:visibility="invisible"
+                android:clickable="true"/>
+            <ImageButton
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/button_heart_empty"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="heart empty; click to favorite"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/heart_empty"
+                android:visibility="visible"
+                android:clickable="true"/>
+
+            <ImageButton
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/button_share"
+                android:layout_alignParentEnd="false"
+                android:contentDescription="share button"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/ic_share_white_48dp"
+                android:visibility="invisible"
+                android:clickable="true"
+                android:layout_alignTop="@+id/button_heart_full"
+                android:layout_toLeftOf="@+id/button_heart_full"/>
+    </RelativeLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_weight="50"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:background="@drawable/detail_gradient">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/overviewLabel"
+            android:textSize="22sp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            tools:text = "descriptions ... \n1234567890\n 0987654321\n"/>
+    </ScrollView>
+
+</LinearLayout>

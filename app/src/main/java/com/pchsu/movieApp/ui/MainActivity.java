@@ -33,7 +33,10 @@ public class MainActivity extends AppCompatActivity
                     .commit();
         }
     }
-
+    @Override
+    protected void onPause(){
+        super.onPause();
+    }
     //
     // implementation of callback interface
     //
@@ -51,6 +54,9 @@ public class MainActivity extends AppCompatActivity
 
     // NOTE: the fragment callee should handle null movie pointer also
     //       In the case of null movie pointer, they should clear the view
+    // This function has 2 uses:
+    // (1) Table/multi-pane mode : to inform detail fragments to update the views
+    // (2) phone/one-pane mode: to start new activity displaying details
     public void onMovieSelected (MovieInfo movie){
 
         if (isTwoPane()){  // three-pane layout

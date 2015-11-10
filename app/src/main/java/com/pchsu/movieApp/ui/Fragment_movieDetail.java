@@ -6,21 +6,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,8 +55,6 @@ public class Fragment_movieDetail extends Fragment{
     // call back interface
     private Communication mCallBack;
 
-    @Bind(R.id.topSection) RelativeLayout mTopSec;
-    @Bind(R.id.middleSection) RelativeLayout mMiddleSec;
     @Bind(R.id.titleImage) ImageView mTitleImage;
     @Bind(R.id.titleLabel) TextView mTitleLabel;
     @Bind(R.id.fullTitleLabel) TextView mFullTitleLabel;
@@ -70,7 +66,7 @@ public class Fragment_movieDetail extends Fragment{
     @Bind(R.id.button_heart_empty) ImageButton mButtonHeartEmpty;
     @Bind(R.id.button_heart_full) ImageButton mButtonHeartFull;
     @Bind(R.id.button_share) ImageButton mButtonShare;
-    @Bind(R.id.layout_movie_detail) RelativeLayout mLayout;
+    @Bind(R.id.layout_movie_detail) LinearLayout mLayout;
 
     public static Fragment_movieDetail newInstance() {
         Fragment_movieDetail fragment = new Fragment_movieDetail();
@@ -98,21 +94,10 @@ public class Fragment_movieDetail extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // program the sections' height based on the screen size and the weight integer specified in xml
-        mResources = getResources();
-        DisplayMetrics metrics = mResources.getDisplayMetrics();
-
-        int topSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.topSecWeight) / 100;
-        int middleSecHeight = metrics.heightPixels * mResources.getInteger(R.integer.middleSecWeight) / 100;
-
 
         // inflate the view and instantiate all elements
         final View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
-
-        // set heights for the top and middle sections
-        mTopSec.getLayoutParams().height = topSecHeight;
-        mMiddleSec.getLayoutParams().height = middleSecHeight;
 
         mOnCreatedViewCalled = true;
 
@@ -122,12 +107,6 @@ public class Fragment_movieDetail extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        int orientation = mContext.getResources().getConfiguration().orientation;
-
-        // adjust the height of backdrop picture for large screen portrait mode
-        if (mCallBack.isTwoPane() && orientation == Configuration.ORIENTATION_PORTRAIT){
-            mTopSec.getLayoutParams().height = mTopSec.getLayoutParams().height/2;
-        }
 
         // delay the screen update until now,
         // because this point promises pane layout check in Activity OnCreate is done
@@ -137,7 +116,6 @@ public class Fragment_movieDetail extends Fragment{
             Parcelable parcelable = intent.getParcelableExtra(MainActivity.MOVIE_INFO);
             mMovie = (MovieInfo) parcelable;
             updateDetail();
-
         }else{
             mMovie = mCallBack.requestDefaultMovie();
             updateDetail();
@@ -158,8 +136,10 @@ public class Fragment_movieDetail extends Fragment{
                 FavoriteEntry.COLUMN_ID + "=?",
                 new String[]{mMovie.getId() + ""},
                 null);
-        mOriginalFavoriteState = (cursor.getCount()!= 0);
-        cursor.close();
+        if (cursor != null) {
+            mOriginalFavoriteState = (cursor.getCount()!= 0);
+            cursor.close();
+        }
     }
 
     @Override
@@ -212,15 +192,18 @@ public class Fragment_movieDetail extends Fragment{
                 FavoriteEntry.COLUMN_ID + "=?",
                 new String[]{mMovie.getId() + ""},
                 null);
-        if (cursor.getCount() ==0){
-            Log.d(FavoriteMovieProvider.TAG, "query gets no rows");
-            mButtonHeartFull.setVisibility(View.INVISIBLE);
-            mButtonHeartEmpty.setVisibility(View.VISIBLE);
-        }else{
-            mButtonHeartEmpty.setVisibility(View.INVISIBLE);
-            mButtonHeartFull.setVisibility(View.VISIBLE);
+
+        if (cursor != null) {
+            if (cursor.getCount() == 0) {
+                Log.d(FavoriteMovieProvider.TAG, "query gets no rows");
+                mButtonHeartFull.setVisibility(View.INVISIBLE);
+                mButtonHeartEmpty.setVisibility(View.VISIBLE);
+            } else {
+                mButtonHeartEmpty.setVisibility(View.INVISIBLE);
+                mButtonHeartFull.setVisibility(View.VISIBLE);
+            }
+            cursor.close();
         }
-        cursor.close();
 
         // using picasso api to load images from content provider or the internet
         // Favorite: load images from local storage
@@ -307,9 +290,11 @@ public class Fragment_movieDetail extends Fragment{
             Cursor cursor = mResolver.query(MovieContract.FavoriteEntry.CONTENT_URI, null,
                                             FavoriteEntry.COLUMN_ID + "=?",
                                             Args, null);
-            if (cursor.getCount() != 0) {
-                cursor.close();
-                return true;
+            if (cursor !=null) {
+                if (cursor.getCount() != 0) {
+                    cursor.close();
+                    return true;
+                }
             }
 
             // store poster and backdrop image into external storage

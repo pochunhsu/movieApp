@@ -8,7 +8,7 @@
               tools:context="com.example.android.sunshine.app.MainActivity">
 
     <!--
-    This layout is a two-pane layout for the Items master/detail flow.
+    This layout is a three-pane layout for the Items master/detail flow.
     -->
 
     <fragment
@@ -16,7 +16,7 @@
         android:name="com.pchsu.movieApp.ui.Fragment_movieDisplay"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2">
+        android:layout_weight="1">
 
     </fragment>
     <fragment
@@ -24,14 +24,14 @@
         android:name="com.pchsu.movieApp.ui.Fragment_movieDetail"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2">
+        android:layout_weight="1">
     </fragment>
     <fragment
         android:id="@+id/fragment_movieDetail_more"
         android:name="com.pchsu.movieApp.ui.Fragment_movieDetail_more"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2">
+        android:layout_weight="1">
     </fragment>
 
 </LinearLayout>

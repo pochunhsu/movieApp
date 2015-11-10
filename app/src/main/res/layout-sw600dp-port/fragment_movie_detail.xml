@@ -7,45 +7,45 @@
               android:orientation="vertical">
 
     <RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="30"
-    android:background="@drawable/title_image_gradient"
-    android:id="@+id/backdrop">
-    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
+        android:layout_height="0dp"
+        android:layout_weight="30"
+        android:background="@drawable/title_image_gradient"
+        android:id="@+id/backdrop">
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/titleImage"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/title_background_description"/>
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/titleImage"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/title_background_description"/>
 
-        <View
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/titleImageGradient"
+                android:layout_gravity="center"/>
+            <!--  background gradient could be used for display text -->
+            <!--  android:background = "@drawable/title_image_gradient" -->
+
+        </FrameLayout>
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/titleImageGradient"
-            android:layout_gravity="center"/>
-        <!--  background gradient could be used for display text -->
-        <!--  android:background = "@drawable/title_image_gradient" -->
+            android:layout_height="wrap_content"
+            android:id="@+id/titleLabel"
+            android:textSize="40sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:text = "Title"
+            android:visibility="invisible"/>
 
-    </FrameLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/titleLabel"
-        android:textSize="40sp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        tools:text = "Title"
-        android:visibility="invisible"/>
-
-</RelativeLayout>
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -160,17 +160,17 @@
             </RelativeLayout>
 
             <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="45"
-                    android:id="@+id/overviewLabel"
-                    android:textSize="22sp"
-                    android:layout_below="@+id/poster"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    tools:text = "descriptions ... \n1234567890\n 0987654321\n"/>
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="45"
+                android:id="@+id/overviewLabel"
+                android:textSize="22sp"
+                android:layout_below="@+id/poster"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                tools:text = "descriptions ... \n1234567890\n 0987654321\n"/>
 
         </LinearLayout>
     </ScrollView>
